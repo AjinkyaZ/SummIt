@@ -1,0 +1,64 @@
+/* CSS declarations go here */
+body 
+{
+	font-family: 'Oswald', sans-serif;
+	background: #e6e6e6;
+	
+}
+p
+{
+	font-size:20px;
+	font-family: 'Bitter', serif;
+}
+.art_unit
+{
+	background: #fff;
+	margin: 20px;
+	font-size: 30px;
+	width: 80%;
+	height: 250px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    overflow: hidden;
+    -webkit-transition:  all 0.4s ease;
+    -o-transition:  all 0.4s ease;
+    transition:  all 0.4s ease;
+}
+.art_unit:hover 
+{
+    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    height: 550px;
+}
+.unit_imagediv
+{
+	height: 250px;
+}
+.unit_contentdiv
+{
+	height: 250px;
+	text-align: left;
+	padding-right: 20px;
+	padding-left: 10px;
+	padding-top: 0px;
+	padding-bottom: 20px;
+
+}
+.art_image
+{
+	max-height: 250px;
+	width: 100%;
+}
+.art_info>li
+{
+	display: inline;
+}
+.unit_bodydiv
+{
+	padding: 20px 20px 20px 20px;
+}
+.banner
+{
+	background: red;
+	height:20px;
+	position: absolute;
+	top: 0px;
+}

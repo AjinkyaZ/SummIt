@@ -1,0 +1,50 @@
+<head>
+  <title>fyproject-meteor</title>
+  <link href='http://fonts.googleapis.com/css?family=Oswald|Bitter' rel='stylesheet' type='text/css'>
+  <link href='bootstrap.min.css'>
+</head>
+
+<body>
+<div class = 'container-fluid'>
+   {{> viewArticles}}
+</div>
+<!--<script src = 'jquery.min.js'></script>
+<script src='bootstrap.min.js'></script>-->
+</body>
+
+<template name="viewArticles">
+       <!-- Iterate on all Objects fetched by the Helper Class-->
+       {{#each article}}
+         <div class='row'>
+         <center>
+         <div class='art_unit'>
+         <div class="row">
+         <div class='col-lg-4 col-md-4 col-sm-6  unit_imagediv'>
+         <img class = 'img-responsive art_image' src={{Image}}>
+         </div>
+         <div class='col-lg-8 col-md-8 col-sm-6  unit_contentdiv'>
+         <h2 >{{Title}}</h2>
+        
+         </div>
+         </div>
+         <div class="row unit_bodydiv">
+         <p style = "font-size: 25px;">
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Iste impedit nam eum ex earum in officia odio cum necessitatibus provident assumenda, vel, voluptatem quos, facere repellat minima aliquid soluta nisi.
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Maiores perspiciatis exercitationem atque veritatis velit. Dolor saepe ab cum ex necessitatibus. Nesciunt fuga tempore aspernatur nobis quisquam necessitatibus dolores, autem laborum!
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis accusantium cumque quis? Tenetur illo nulla quisquam delectus, consequuntur dolor libero sequi ullam consectetur fuga suscipit nesciunt et atque cumque porro.
+          </p>
+         </div>
+         <div class="row banner">
+           
+         </div>
+         <!--<div class='row'>
+         <div class = 'col-lg-8 col-md-8 col-sm-6 unit_contentdiv'>
+         {{Body}}
+         </div>
+         </div>-->
+         </div><!--art_unit1 closed-->
+         </center>
+         </div><!--row closed-->
+
+       {{/each}}
+   </template>
