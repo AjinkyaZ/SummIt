@@ -13,7 +13,7 @@ reuters_top = feedparser.parse('http://feeds.reuters.com/reuters/topNews')
 #cnn_sport = feedparser.parse('http://rss.cnn.com/rss/edition_sport.rss')
 
 # Main code starts here
-src_feed = cnn_tech
+src_feed = cnn_world
 len_src_feed = len(src_feed['entries'])
 print len_src_feed
 
@@ -39,6 +39,8 @@ def todb_article():
             try:
                 image_src = image_set['data-medium-src']
             except KeyError, e:
+                image_src = 'dota.jpg'
+            except TypeError, e:
                 image_src = 'dota.jpg'
             container = parsed_article.find(
                 'div', attrs={'class': 'l-container'})
@@ -70,7 +72,7 @@ db = client.feeds_database
 articles = db.articles
 db.articles.remove({})
 # print db.collection_names()
-
+print "Source Feed ", src_feed
 for article in todb_article():
     article_id = articles.insert_one(article).inserted_id
     print "inserting into db"
