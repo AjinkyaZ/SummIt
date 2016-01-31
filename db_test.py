@@ -2,7 +2,7 @@ import pymongo as pm
 from collections import defaultdict
 import string
 import math
-
+from textrank import *
 
 client = pm.MongoClient('localhost', 3001)
 db = client.feeds_database
@@ -13,7 +13,7 @@ for collection in db.collection_names():
 
 print ""
 article_list = articles.find()
-article_list = article_list.sort('ID', 1)
+article_list = sorted(article_list)
 aggregate_text = ""
 for article in article_list:
     print "********************************************"
@@ -28,6 +28,17 @@ for article in article_list:
     body_text_final = body_text_str.encode("utf-8")
     aggregate_text = aggregate_text + str(body_text_final)
     print "Body : ", body_text_final
+    """textrank_res = textrank(body_text_final)
+    summary_indices = textrank_res[0]
+    summary_sents = textrank_res[1]
+    summary = ""
+    len_summ = 5
+    for i in range(len_summ):
+        index = summary_indices[i]
+        summary += summary_sents[index]"""
+    print "--------------------------------"
+    summary = gen_summary(body_text_final)
+    print "Summary : ", summary
     print "--------------------------------"
     print "Link : ", article['Link']
     print "Source : ", article['Source']
