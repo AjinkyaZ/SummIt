@@ -13,7 +13,7 @@ def todb_article(source_feed, num_articles):
     article_text = {}
     date_now = datetime.now()
     date_now = date_now.strftime('%Y-%m-%d')
-    
+
     for article_num in range(num_articles):
         print "fetching data -- link", (article_num+1)
         article_link = source_feed['entries'][article_num]['link']
@@ -42,6 +42,12 @@ def todb_article(source_feed, num_articles):
                 'span', attrs={'id': 'articleText'})
             article_body = ["".join(x.findAll(text=True))
                             for x in container.findAllNext("p")]
+            image_src = 'dota.jpg'
+        elif "timesofindia.feedsportal.com" in article_link:
+            article_src = "TOI"
+            container = parsed_article.find(
+                'div', attrs={'class': 'section1'})
+            article_body = ["".join(x.findAll(text=True)) for x in container.findAllNext('div')]
             image_src = 'dota.jpg'
 
         if len(article_body) < 12:  # article is too short
@@ -75,13 +81,10 @@ def main():
         'http://rss.cnn.com/rss/edition_technology.rss')
     reuters_top = feedparser.parse('http://feeds.reuters.com/reuters/topNews')
     #cnn_sport = feedparser.parse('http://rss.cnn.com/rss/edition_sport.rss')
+    toi_india = feedparser.parse('http://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms')
 
     # Main code starts here
-    src_feed = cnn_world
-    len_src_feed = len(src_feed['entries'])
-    print "No. of articles in source feed", len_src_feed
-    print "Enter no. of articles to parse, must be less than", len_src_feed
-    n = int(raw_input())
+    src_feed = cnn_tech
     start = datetime.now()
 
     client = pm.MongoClient('localhost', 3001)
@@ -90,14 +93,20 @@ def main():
     db.articles.remove({})
     print db.collection_names()
     # print "Source Feed ", src_feed
-    for article in todb_article(src_feed, n):
-        article_id = articles.insert_one(article).inserted_id
-        print "inserting into db"
-        print article['ID']
-        print article['Title']
-        print article['Image']
-        # print article_id
-        # print articles.find_one(article_id)
+    sources = [cnn_tech, cnn_world]
+    for src_feed in sources:
+        len_src_feed = len(src_feed['entries'])
+        print "No. of articles in source feed", len_src_feed
+        print "Enter no. of articles to parse, must be less than", len_src_feed
+        n = int(raw_input())
+        for article in todb_article(src_feed, n):
+            article_id = articles.insert_one(article).inserted_id
+            print "inserting into db"
+            print article['ID']
+            print article['Title']
+            print article['Image']
+            # print article_id
+            # print articles.find_one(article_id)
     print datetime.now()-start
 
 

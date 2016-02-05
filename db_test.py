@@ -32,7 +32,7 @@ def main():
         print "Body : ", body_text_final
         print "--------------------------------"
         summary = gen_summary(body_text_str)
-        #summary = summary.decode("utf-8")
+        summary = summary.encode("utf-8")
         print "Summary : ", summary
         print "--------------------------------"
         print "Link : ", article['Link']

@@ -5,26 +5,32 @@ from networkx import drawing
 import matplotlib.pyplot as plt
 
 
+
+#def pagerank():
+    # to-do
+
 def textrank(doc):
-    #print doc
+    # print doc
     tokenizer = PunktSentenceTokenizer()
-    #print tokenizer
+    # print "Tokenizer, ", tokenizer
     doclist = tokenizer.tokenize(doc)
-    #print doclist
+    # print "Doc list: ", doclist
     vectorizer = TfidfVectorizer()
-    #print vectorizer
+    # print "Vectorizer:", vectorizer
     docvectors = vectorizer.fit_transform(doclist)
-    #print docvectors
+    # print "Docvectors", docvectors
+    # print "Docvectors array", docvectors.toarray()
     docmatrix = docvectors*docvectors.T
-    #print docmatrix
+    # print "Docmatrix", docmatrix
+    # print "Docmatrix array", docmatrix.toarray()
     docgraph = nx.from_scipy_sparse_matrix(docmatrix)
-    #print docgraph
+    # print docgraph
     scores = nx.pagerank(docgraph)
     n = len(scores)
     scorelist = []
     for i in range(n):
         scorelist.append((i, scores[i]))
-    scoressorted = sorted(scorelist, key = lambda x:x[1], reverse = True)
+    scoressorted = sorted(scorelist, key=lambda x: x[1], reverse=True)
     sortedsents = [scoressorted[i][0] for i in range(n)]
     return (sortedsents, doclist)
 
@@ -35,8 +41,8 @@ def gen_summary(docu):
     summsents = textrankres[1]
     summary = ""
     #d = int(raw_input("enter summary len in sentences\n"))
-    d=7
-    if d>len(summsents):
+    d = 4
+    if d > len(summsents):
         print "Invalid"
     else:
         for i in range(d):
@@ -44,10 +50,14 @@ def gen_summary(docu):
             summary += summsents[index]
         return summary
 
+
 def main():
     docu = """
-(CNN)For 36 days, they were trapped 700 feet underground, dependent on food lowered to them by the rescue workers who were plotting to get them out.,On Friday night, the four remaining miners known to have survived a December 25 mine collapse in eastern China were finally pulled to the surface.,Rescuers pulled the miners one by one from the collapsed gypsum mine in eastern China's Pingyi County, with video showing the cable lifting them by a harness.,The rescues were shown on state-run China Central Television. As one of the miners put his feet back on the surface, workers in orange coats and helmets surrounded him as a crowd of reporters and photographers moved in just behind them to record the spectacle.,The miner was put on a gurney and then into an ambulance.,Information on the miners' conditions wasn't immediately available.,At least 1 dead; 13 others missing,Twenty-nine people were working in the gypsum mine on December 25 when it collapsed, CCTV has reported. At least one died, 11 escaped, and 17 were believed to be trapped underground.,Five days later, rescuers who lowered infrared cameras into the mine found four survivors, CCTV reported.,Through narrow relief holes that were drilled, rescuers lowered food, lamps and clothes to the four. The 13 other miners are still missing.,Over time, rescuers drilled a wide hole toward the four survivors. The rescuers initially planned to lower a man-size capsule to the four, CCTV reported this month.,That would have been similar to a method used in 2010 to rescue 33 miners who were trapped 2,300 feet underground in a Chilean mine for more than two months.,Friday's CCTV footage did not show any capsule as the miners appeared above ground. Rather, the video showed the miners emerging from a hole in a platform over the mine, wearing a harness attached to a cable that was pulling them up.  ,Where the rescued Chilean miners are, 5 years after rescue ,The owner of the mine, Ma Congbo, chief executive of Yurong Trade Co., committed suicide two days after the collapse by jumping into a mine well. Four county-level officials were fired on December 29, one day before the survivors were found, according to Xinhua, the Chinese government news agency. ,CNN's Merieme Arif and Tim Schwarz contributed to this report."""
+Beirut, Lebanon (CNN)It's a pretty normal bus -- windows slightly cracked, dust, the occasional button missing on the dashboard. But when its passengers say they take it knowing they could be on a one-way ticket to death, they aren't exaggerating. From the dark and dank underpass that is Charles Helou bus station in central Beirut, leaves the bus to Raqqa. It has done so for years, but now that Raqqa is the capital of ISIS' self-declared caliphate, the bus crosses the most dangerous border in the world. And people do pay to get on it. In a 24-hour journey, it travels from Beirut, across the border to regime-held Damascus. Then it heads to Palmyra, held by ISIS, before moving north toward Raqqa. The nine passengers we met were adamant about two things. First that ISIS would most likely let them in to Raqqa. That suggests they know someone there, and they didn't want to go into details. Second, nobody wanted to have their face filmed or name used.  The fear was overpowering and that permeates exactly how you get ready for the trip.  Last cigarettes are smoked. Not as people worry they may not survive the trip, but because ISIS has banned smoking. They've also banned music, and much else that's part of normal lifestyles in the modern world. If you break their atavistic, moral code, you can be flogged, even beheaded.  Read: The terrifying reality of living under ISIS in Raqqa ISIS checks So there is a strange cleansing process on the ride. Smokers douse their fingers in perfume and jettison their cigarettes. Music, racy pictures, numbers of friends close to the Syrian regime -- all are deleted from mobile phones. ISIS check these things thoroughly. The manager of the bus explains the rules for the trip, though it's a journey he never makes.  "A woman that's not dressed right will be sent to Islamic training," he said. "She, of course, needs a male relative to escort her. Men need to leave their beards grown long in their natural state, with mustaches trimmed. Trousers should not be tight and a certain height over shoes. But ISIS realizes when people travel, they can't always look like that, so it's OK." The bus always comes back empty. ISIS rarely lets people out. Which begs the question, why are they surrendering themselves to life under ISIS? Surely they know what they are getting in to? One group of passengers has a specific reason to travel. They are accompanying the body of their relative back to be buried in his hometown. Some shed tears. He died of a heart attack. The process of repatriation is a nightmare. The bus's eventual departure will be delayed, we learn later, by 24 hours, because they have to wait for the appropriate paperwork to be able to take the body out of Lebanon. Dangers The hazards of the route are relayed in the most matter-of-fact chatter.  Sometimes a fighter jet will buzz the coach, flying low. Sometimes the buses are hit by sniper fire. Most of the time they keep on driving.  The manager tells us: "A plane might [drop a bomb] some distance from the bus. It's normal! No one can really pin down where the sniper fire is coming from. That's when the passengers get afraid." Can people ever leave Raqqa on the bus? We hear two stories that suggest it is possible. One man tells us the sick are sometimes given 15 days' leave to seek medical treatment. If they come back late, their property and home is confiscated by ISIS. A woman, we are told, has a daughter in Raqqa, who she is trying to get out. When we talk to her, she insists she has been on a trip to the Gulf region and is just on her way home. Dissimilation is a necessary part of life on this bus. One man tells us, though, of his sorrow for his hometown, where his children have not left the house in the daytime to go to school for four years.  "It used to be my heaven," he says, before ISIS rule. The war against them, the poverty that it caused and now even the trash littering the streets "has made it my hell." 
+    """
+    print "Article text"
     print docu
+    print "Summary\n"
     print gen_summary(docu)
 
 
