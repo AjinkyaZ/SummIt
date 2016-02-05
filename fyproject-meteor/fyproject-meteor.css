@@ -26,8 +26,6 @@ p
 .art_unit:hover 
 {
     box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
-    height: auto;
-    overflow: auto;
 }
 .unit_imagediv
 {
@@ -37,11 +35,7 @@ p
 {
 	height: 250px;
 	text-align: left;
-	padding-right: 20px;
-	padding-left: 10px;
-	padding-top: 0px;
-	padding-bottom: 20px;
-
+	padding: 20px 20px 20px 20px;
 }
 .art_image
 {
