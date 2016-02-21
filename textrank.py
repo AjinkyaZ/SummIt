@@ -1,17 +1,89 @@
 from nltk.tokenize.punkt import PunktSentenceTokenizer
 from nltk.tokenize import word_tokenize
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 from nltk.corpus import stopwords
-from sklearn.feature_extraction.text import TfidfVectorizer
-import networkx as nx
+from collections import Counter
+from math import log10, log
 from networkx import drawing
+import networkx as nx
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 
 #def pagerank():
     # to-do
 
-def textrank(doc):
+def similarity(s1, s2):
+    s1 = s1.split()
+    #print "s1 ---", s1
+    s2 = s2.split()
+    #print "s2 ---", s2
+    terms_s1 = set(s1) #eliminate duplicates
+    terms_s2 = set(s2)
+    #print log(len(terms_s1)), log(len(terms_s2))
+    common_terms = terms_s1.intersection(terms_s2)
+    #print "len comm terms", len(common_terms)
+    if (log(len(terms_s1))+log(len(terms_s2)))==0: sim = 0.001
+    else:
+        sim = len(common_terms)/(log10(len(terms_s1))+log10(len(terms_s2)))
+        return sim
+
+def getsortedsents(inputscores):
+    n = len(inputscores)
+    scorelist = []
+    for i in range(n):
+        scorelist.append((i, inputscores[i])) #list of tuples with sentence index and its ranking
+    scoressorted = sorted(scorelist, key=lambda x: x[1], reverse=True)
+    #for i in scoressorted: print i
+    sortedsents = [scoressorted[i][0] for i in range(n)] #get sorted sentence indices
+    sortedsents.remove(max(sortedsents)) #remove sentence index corresponding to title, (last since it was appended later)
+    return sortedsents
+
+
+def textrank(doc, title):
+    if "(CNN)" in doc:
+       doc = doc.strip("(CNN)") #remove that irritating (CNN) tag
+    pstoken = PunktSentenceTokenizer()
+    doclist = pstoken.tokenize(doc) #split into sentences
+    doclist.append(title) #append title to list for additional info
+    n = len(doclist)
+    #for i in range(n):
+    #    print i, "-->", doclist[i]
+    #print "\n\n"
+    stoplist = stopwords.words('english')
+    #print stoplist, "\n\n"
+    doclist_nostop = doclist[:]  #create working copy of doclist
+    removed_stops = doclist[:]
+    #the below statements remove all stopwords from every sentence in the list
+    #the sentences were split into separate terms and reconstructed without stopwords
+    #stopword removal is significantly affecting performance (better summaries!)
+    for i in range(n):
+        doclist_nostop[i] = [term for term in doclist[i].split() if term.lower() not in stoplist]
+        doclist_nostop[i] = (' ').join(doclist_nostop[i])
+        removed_stops[i] = [term for term in doclist[i].split() if term.lower() in stoplist]
+        removed_stops[i] = (' ').join(removed_stops[i])
+        #print i, "-->", doclist_nostop[i]
+    sim_arr = [[1 for i in range(n)] for j in range(n)]
+    for i in range(n):
+        for j in range(n):
+            sim_arr[i][j]=float("{0:.4f}".format(similarity(doclist_nostop[i], doclist_nostop[j]))) #scale to 4 decimals
+    for i in range(n):
+        minVal = min(sim_arr[i])
+        maxVal = max(sim_arr[i])
+        #print i, minVal, maxVal
+        sim_arr[i] = [(q-minVal)/(maxVal-minVal) for q in sim_arr[i]] #normalize between 0 and 1 
+    docmatrix = np.array(sim_arr)
+    dg = nx.from_numpy_matrix(docmatrix)
+    scores = nx.pagerank(dg)
+    sortedsents = getsortedsents(scores)
+    return (sortedsents, doclist)
+
+
+
+
+
+def textrank_tfidf(doc):
     # print doc
     tokenizer = PunktSentenceTokenizer()
     # print "Tokenizer, ", tokenizer
@@ -41,8 +113,8 @@ def textrank(doc):
     return (sortedsents, doclist)
 
 
-def gen_summary(docu):
-    textrankres = textrank(docu)
+def gen_summary(docu, title):
+    textrankres = textrank(docu, title)
     summindices = textrankres[0]
     summsents = textrankres[1]
     summary = ""
@@ -58,13 +130,12 @@ def gen_summary(docu):
 
 
 def main():
-    docu = """
-Beirut, Lebanon (CNN)It's a pretty normal bus -- windows slightly cracked, dust, the occasional button missing on the dashboard. But when its passengers say they take it knowing they could be on a one-way ticket to death, they aren't exaggerating. From the dark and dank underpass that is Charles Helou bus station in central Beirut, leaves the bus to Raqqa. It has done so for years, but now that Raqqa is the capital of ISIS' self-declared caliphate, the bus crosses the most dangerous border in the world. And people do pay to get on it. In a 24-hour journey, it travels from Beirut, across the border to regime-held Damascus. Then it heads to Palmyra, held by ISIS, before moving north toward Raqqa. The nine passengers we met were adamant about two things. First that ISIS would most likely let them in to Raqqa. That suggests they know someone there, and they didn't want to go into details. Second, nobody wanted to have their face filmed or name used.  The fear was overpowering and that permeates exactly how you get ready for the trip.  Last cigarettes are smoked. Not as people worry they may not survive the trip, but because ISIS has banned smoking. They've also banned music, and much else that's part of normal lifestyles in the modern world. If you break their atavistic, moral code, you can be flogged, even beheaded.  Read: The terrifying reality of living under ISIS in Raqqa ISIS checks So there is a strange cleansing process on the ride. Smokers douse their fingers in perfume and jettison their cigarettes. Music, racy pictures, numbers of friends close to the Syrian regime -- all are deleted from mobile phones. ISIS check these things thoroughly. The manager of the bus explains the rules for the trip, though it's a journey he never makes.  "A woman that's not dressed right will be sent to Islamic training," he said. "She, of course, needs a male relative to escort her. Men need to leave their beards grown long in their natural state, with mustaches trimmed. Trousers should not be tight and a certain height over shoes. But ISIS realizes when people travel, they can't always look like that, so it's OK." The bus always comes back empty. ISIS rarely lets people out. Which begs the question, why are they surrendering themselves to life under ISIS? Surely they know what they are getting in to? One group of passengers has a specific reason to travel. They are accompanying the body of their relative back to be buried in his hometown. Some shed tears. He died of a heart attack. The process of repatriation is a nightmare. The bus's eventual departure will be delayed, we learn later, by 24 hours, because they have to wait for the appropriate paperwork to be able to take the body out of Lebanon. Dangers The hazards of the route are relayed in the most matter-of-fact chatter.  Sometimes a fighter jet will buzz the coach, flying low. Sometimes the buses are hit by sniper fire. Most of the time they keep on driving.  The manager tells us: "A plane might [drop a bomb] some distance from the bus. It's normal! No one can really pin down where the sniper fire is coming from. That's when the passengers get afraid." Can people ever leave Raqqa on the bus? We hear two stories that suggest it is possible. One man tells us the sick are sometimes given 15 days' leave to seek medical treatment. If they come back late, their property and home is confiscated by ISIS. A woman, we are told, has a daughter in Raqqa, who she is trying to get out. When we talk to her, she insists she has been on a trip to the Gulf region and is just on her way home. Dissimilation is a necessary part of life on this bus. One man tells us, though, of his sorrow for his hometown, where his children have not left the house in the daytime to go to school for four years.  "It used to be my heaven," he says, before ISIS rule. The war against them, the poverty that it caused and now even the trash littering the streets "has made it my hell." 
-    """
+    text = """(CNN)After eluding capture for years, two Mafia bosses have been arrested in an underground bunker in southern Italy.   Police seized mobsters Giuseppe Ferraro, 47, and Giuseppe Crea, 37,  in Calabria region Friday, according to Italian news agency Ansa.  Ferraro was found guilty of murder and Mafia association decades ago, and had been a fugitive since 1998. Crea was convicted of Mafia association and had been on the run for nine years, according to the news agency. Their hideout had an array of weapons, including rifles, pistols and machine guns. "Today is another great day for everyone and for the country because justice has won," Interior Minister Angelino Alfano said after their arrest.  Beyond Italian borders The two men are part of 'Ndrangheta, a dangerous criminal organization that has tentacles worldwide. The group is based in Calabria, where the two men were arrested.   'Ndrangheta's power has grown beyond Italian borders.  Two years ago, Italian officials said the group is linked to drug trafficking  in South and Central America, Canada and the United States.  The 'Ndrangheta was formed in the 1860s, and is involved in kidnappings, corruption, drug trafficking, gambling and murders, according to the FBI.  It has between 100-200 members in the United States, mostly in New York and Florida.  Opinion: Will Mafia ever loosen its grip on Italy? """
+    title = """Italian police arrest 2 fugitive Mafia bosses in underground bunker"""
     print "Article text"
-    print docu
+    print text
     print "Summary\n"
-    print gen_summary(docu)
+    print gen_summary(text, title)
 
 
 if __name__ == "__main__":

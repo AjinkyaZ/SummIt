@@ -56,9 +56,8 @@ def todb_article(source_feed, num_articles):
             continue
 
         body_text_str = ' '.join(article_body)
-        body_text_str = body_text_str.encode("utf-8").translate(None, "(CNN)").decode("utf-8")
         #body_text_final = body_text_str.encode("utf-8")
-        article_summary = textrank.gen_summary(body_text_str)
+        article_summary = textrank.gen_summary(body_text_str, article_title)
         # for i in range(15):
         #   article_text[article_num][i]=parsed_article.p.text
         #   print article_text[article_num][i]
