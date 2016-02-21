@@ -1,4 +1,6 @@
 from nltk.tokenize.punkt import PunktSentenceTokenizer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 import networkx as nx
 from networkx import drawing
@@ -13,7 +15,11 @@ def textrank(doc):
     # print doc
     tokenizer = PunktSentenceTokenizer()
     # print "Tokenizer, ", tokenizer
+    docterms = word_tokenize(doc)
+    stoplist = stopwords.words('english')
+    docterms_nostop = [term.lower() for term in docterms if term not in stoplist]
     doclist = tokenizer.tokenize(doc)
+    #print docterms_nostop
     # print "Doc list: ", doclist
     vectorizer = TfidfVectorizer()
     # print "Vectorizer:", vectorizer
@@ -41,13 +47,13 @@ def gen_summary(docu):
     summsents = textrankres[1]
     summary = ""
     #d = int(raw_input("enter summary len in sentences\n"))
-    d = 4
+    d = 3
     if d > len(summsents):
         print "Invalid"
     else:
         for i in range(d):
             index = summindices[i]
-            summary += summsents[index]
+            summary += " "+summsents[index]
         return summary
 
 

@@ -29,32 +29,34 @@ def todb_article(source_feed, num_articles):
                     'img', attrs={'class': 'media__image'})
                 image_src = image_set['data-medium-src']
             except KeyError, e:
-                image_src = 'dota.jpg'
+                image_src = 'default.png'
             except TypeError, e:
-                image_src = 'dota.jpg'
+                image_src = 'default.png'
             container = parsed_article.find(
                 'div', attrs={'class': 'l-container'})
             article_body = ["".join(x.findAll(text=True)) for x in container.findAllNext(
                 "p", attrs={'class': 'zn-body__paragraph'})]
+        
         elif "reuters.com" in article_link:
             article_src = "Reuters"
             container = parsed_article.find(
                 'span', attrs={'id': 'articleText'})
             article_body = ["".join(x.findAll(text=True))
                             for x in container.findAllNext("p")]
-            image_src = 'dota.jpg'
+            image_src = 'default.png'
         elif "timesofindia.feedsportal.com" in article_link:
             article_src = "TOI"
             container = parsed_article.find(
                 'div', attrs={'class': 'section1'})
             article_body = ["".join(x.findAll(text=True)) for x in container.findAllNext('div')]
-            image_src = 'dota.jpg'
+            image_src = 'default.png'
 
         if len(article_body) < 12:  # article is too short
             print "length of article insufficient"
             continue
 
         body_text_str = ' '.join(article_body)
+        body_text_str = body_text_str.encode("utf-8").translate(None, "(CNN)").decode("utf-8")
         #body_text_final = body_text_str.encode("utf-8")
         article_summary = textrank.gen_summary(body_text_str)
         # for i in range(15):
@@ -93,12 +95,13 @@ def main():
     db.articles.remove({})
     print db.collection_names()
     # print "Source Feed ", src_feed
-    sources = [cnn_tech, cnn_world]
+    sources = [reuters_top, cnn_world, cnn_tech]
     for src_feed in sources:
         len_src_feed = len(src_feed['entries'])
         print "No. of articles in source feed", len_src_feed
-        print "Enter no. of articles to parse, must be less than", len_src_feed
-        n = int(raw_input())
+        #print "Enter no. of articles to parse, must be less than", len_src_feed
+        #n = int(raw_input())
+        n=2
         for article in todb_article(src_feed, n):
             article_id = articles.insert_one(article).inserted_id
             print "inserting into db"

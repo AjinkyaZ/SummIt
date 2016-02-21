@@ -10,6 +10,47 @@ p
 	font-size:20px;
 	font-family: 'Bitter', serif;
 }
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
+/* Styles */
+h2
+{
+	font-size: 2em !important;
+	padding-left: 5px !important;
+	padding-right: 5px !important;
+	color: #fff;
+	text-shadow: 1px 1px 10px #111;
+}
+span
+{
+	opacity: 0;
+}
+p
+{
+	font-size: 10px;
+}
+a:link, a:visited
+{
+	color: #f00;
+	text-decoration: none;
+}
+.art_image
+{
+	min-height: 500px;
+	max-height: 600px;
+	z-index: 0;
+}
+.unit_contentdiv:
+{
+	position: relative;
+	bottom: 20px;
+	z-index: 10;
+}
+
+}
+
+
+
 .art_unit
 {
 	background: #fff;
@@ -25,7 +66,7 @@ p
 }
 .art_unit:hover 
 {
-    box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }
 .unit_imagediv
 {

@@ -27,9 +27,9 @@ FYProject/
 
 2. Run Python scripts  
    FYProject$ python <filename>  
-   a. feeds_test.py   (fetch data)  
+   a. feeds_test.py   (fetch data, summaries
    b. db_test.py    (display fetched data)  
-   c. summ_test.py   (run summarization algorithm) <skip for now>  
+   c. textrank.py   (summarization algorithm) 
   
 3. Run Meteor application, specifying dbpath used previously  
    FYProject/fyproject-meteor$ MONGO_URL="mongodb://localhost:3001/<dbname>" meteor run --port 3005
