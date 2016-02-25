@@ -27,7 +27,9 @@ def todb_article(source_feed, num_articles):
             try:
                 image_set = parsed_article.find(
                     'img', attrs={'class': 'media__image'})
-                image_src = image_set['data-medium-src']
+                image_src = image_set['src']
+                if "data:image/gif;base64" in image_src:
+                     image_src = image_set['data-src-medium']
             except KeyError, e:
                 image_src = 'default.png'
             except TypeError, e:
@@ -43,21 +45,25 @@ def todb_article(source_feed, num_articles):
                 'span', attrs={'id': 'articleText'})
             article_body = ["".join(x.findAll(text=True))
                             for x in container.findAllNext("p")]
-            image_src = 'default.png'
-        elif "timesofindia.feedsportal.com" in article_link:
-            article_src = "TOI"
-            container = parsed_article.find(
-                'div', attrs={'class': 'section1'})
-            article_body = ["".join(x.findAll(text=True)) for x in container.findAllNext('div')]
-            image_src = 'default.png'
+            try:
+                image_cont = parsed_article.find('div', {'class':'related-photo-container'})
+                image_tag = image_cont.find('img')
+                image_src = image_tag['src']
+            except KeyError, e:
+                image_src = 'default.png'
+            except TypeError, e:
+                image_src = 'default.png'
 
-        if len(article_body) < 12:  # article is too short
+        if len(article_body) < 10:  # article is too short
             print "length of article insufficient"
             continue
 
         body_text_str = ' '.join(article_body)
         #body_text_final = body_text_str.encode("utf-8")
         article_summary = textrank.gen_summary(body_text_str, article_title)
+        #if summary is too short, skip article
+        if len(article_summary) < 200:
+            continue
         # for i in range(15):
         #   article_text[article_num][i]=parsed_article.p.text
         #   print article_text[article_num][i]
@@ -80,7 +86,7 @@ def main():
     cnn_world = feedparser.parse('http://rss.cnn.com/rss/edition_world.rss')
     cnn_tech = feedparser.parse(
         'http://rss.cnn.com/rss/edition_technology.rss')
-    reuters_top = feedparser.parse('http://feeds.reuters.com/reuters/topNews')
+    reuters_top = feedparser.parse('http://feeds.reuters.com/reuters/INtopNews')
     #cnn_sport = feedparser.parse('http://rss.cnn.com/rss/edition_sport.rss')
     toi_india = feedparser.parse('http://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms')
 
@@ -100,7 +106,7 @@ def main():
         print "No. of articles in source feed", len_src_feed
         #print "Enter no. of articles to parse, must be less than", len_src_feed
         #n = int(raw_input())
-        n=2
+        n=6
         for article in todb_article(src_feed, n):
             article_id = articles.insert_one(article).inserted_id
             print "inserting into db"

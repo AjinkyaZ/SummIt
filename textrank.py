@@ -27,7 +27,7 @@ def similarity(s1, s2):
     if (log(len(terms_s1))+log(len(terms_s2)))==0: sim = 0.001
     else:
         sim = len(common_terms)/(log10(len(terms_s1))+log10(len(terms_s2)))
-        return sim
+    return sim
 
 def getsortedsents(inputscores):
     n = len(inputscores)
@@ -67,7 +67,7 @@ def textrank(doc, title):
     sim_arr = [[1 for i in range(n)] for j in range(n)]
     for i in range(n):
         for j in range(n):
-            sim_arr[i][j]=float("{0:.4f}".format(similarity(doclist_nostop[i], doclist_nostop[j]))) #scale to 4 decimals
+            sim_arr[i][j]=float("{0:.4f}".format(float(similarity(doclist_nostop[i], doclist_nostop[j])))) #scale to 4 decimals
     for i in range(n):
         minVal = min(sim_arr[i])
         maxVal = max(sim_arr[i])

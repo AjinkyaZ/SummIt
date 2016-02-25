@@ -17,6 +17,8 @@ def main():
     article_list = articles.find()
     article_list = sorted(article_list)
     aggregate_text = ""
+    total_compression_ratio = 0
+    processed_articles = 0
     for article in article_list:
         print "********************************************"
         print article['ID'], " : "
@@ -31,15 +33,23 @@ def main():
         aggregate_text = aggregate_text + str(body_text_final)
         print "Body : ", body_text_final
         print "--------------------------------"
-        summary = gen_summary(body_text_str)
+        summary = article['Summary']
         summary = summary.encode("utf-8")
         print "Summary : ", summary
+        print "Length of Body (chars) : ", len(body_text_final)
+        print "Length of Summary (chars) : ", len(summary)
+        reduced_words = len(body_text_final)-len(summary)
+        cur_compression_ratio = (reduced_words*1.0)/len(body_text_final)*100
+        total_compression_ratio += cur_compression_ratio
+        print("Compression achieved : {0:.2f}%").format(cur_compression_ratio)
         print "--------------------------------"
         print "Link : ", article['Link']
         print "Source : ", article['Source']
         print "Image : ", article['Image']
         print "Date : ", article['Date']
         print ""
+        processed_articles +=1
+    print "Average Compression achieved : ", (total_compression_ratio/processed_articles)
 
 
 if __name__ == "__main__":
