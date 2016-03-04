@@ -12,7 +12,8 @@ Deepen Padwal
 FYProject/  
 -----> feeds_test.py   ... (fetches data from RSS feeds)  
 -----> db_test.py      ... (displays data stored in DB)  
------> textrank.py    ... (summarization algorithm) <to-do>  
+-----> parser.py      ... (implements parsing article html for content)   
+-----> textrank.py    ... (summarization algorithm)  
 -----> fyproject-meteor/  
 ------------------> fyproject-meteor.html  
 ------------------> fyproject-meteor.css  
@@ -34,15 +35,19 @@ FYProject/
    FYProject/fyproject-meteor$ MONGO_URL="mongodb://localhost:3001/feeds_database" meteor run --port 3005
 
 ###Most Recent Changes  
----Added Compression ratio to db_test.py  
----Summary should be >200 chars in length  
----Article Size must be >10, not 13  
+---Textrank and Parser both use trained tokenization data (edge cases handled)
+---Parser tokenization gives better article text.  
+---Compression data processed while fetching, stored with article in db.  
+---Added article fetch counts.  
+---Added Compression ratio to db_test.py (not anymore, see above)  
+---Summary should be more 200 chars in length, less than 1200 chars.    
+---Article Size must be more than 10, not 13  
 ---Fixed Image Fetching for both CNN, Reuters.  
 ---gen_summary() call in db_test replaced by summary property of article loaded from db (faster)  
 
 ###NOTES:  
 1. Default database name is "feeds_database", consisting of a single "articles" collection.  
    Create this database prior to any operations if running for the first time.   
-2. Default num. of articles fetched from each source is 6 (for now)  
+2. Default num. of articles fetched from each source is 15 (for now)  
 3. Summary generation call is made from feeds_test to textrank.py.  
    Run textrank.py separately to test summarization without affecting articles in DB.

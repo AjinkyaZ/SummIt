@@ -7,8 +7,8 @@ body
 }
 p
 {
-	font-size:20px;
-	font-family: 'Bitter', serif;
+	font-size:25px;
+	font-family: 'Arial', serif;
 }
 /* Smartphones (portrait and landscape) ----------- */
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
@@ -45,8 +45,8 @@ a:link, a:visited
 	position: relative;
 	bottom: 20px;
 	z-index: 10;
+	padding: 10px 20px 10px 30px; /* top right bottom left */
 }
-
 }
 
 
@@ -57,16 +57,21 @@ a:link, a:visited
 	margin: 20px;
 	font-size: 30px;
 	width: 80%;
-	height: auto;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
     overflow: hidden;
-    -webkit-transition:  all 0.4s ease;
-    -o-transition:  all 0.4s ease;
-    transition:  all 0.4s ease;
+    -moz-transition: all 0.75s ease-in-out;
+    -webkit-transition:  all 0.75s ease-in-out;
+    -o-transition:  all 0.75s ease-in-out;
+    transition:  all 0.75s ease-in-out;
 }
 .art_unit:hover 
 {
-    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+    box-shadow: 0 14px 28px rgba(0,0,0,0.50), 0 10px 10px rgba(0,0,0,0.28);
+}
+.art_header
+{
+	background: linear-gradient(to right, #330033 , #262673);
+	color: #fff;
 }
 .unit_imagediv
 {
@@ -76,12 +81,13 @@ a:link, a:visited
 {
 	height: 250px;
 	text-align: left;
-	padding: 20px 20px 20px 20px;
+	padding: 10px 20px 10px 30px; /* top right bottom left */
 }
 .art_image
 {
 	max-height: 250px;
 	width: 100%;
+	height: 100%;
 }
 .art_info>li
 {
@@ -89,7 +95,16 @@ a:link, a:visited
 }
 .unit_bodydiv
 {
-	padding: 20px 20px 20px 20px;
+	text-align: left;
+	padding-left: 30px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-right: 20px;
+}
+span>a:link, span>a:visited
+{
+	text-decoration: none;
+	color: #ff0066;
 }
 .banner
 {
@@ -97,4 +112,106 @@ a:link, a:visited
 	height:20px;
 	position: absolute;
 	top: 0px;
+}
+footer
+{
+	height: 200px;
+	padding: 50px 50px 50px 50px;
+	background:linear-gradient(to right, #330033 , #262673);
+	color: #fff;
+	margin-top: 50px;
+	bottom: 0px;
+}
+
+
+
+
+/*scroll start*/
+.scroll-top-wrapper {
+    position: fixed;
+	opacity: 0;
+	visibility: hidden;
+	overflow: hidden;
+	text-align: center;
+	z-index: 99999999;
+    background-color: transparent;
+	width: 50px;
+	height: 55px;
+	line-height: 55px;
+	right: 30px;
+	bottom: 30px;
+	padding-top: 2px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+	border-bottom-left-radius: 10px;
+	-webkit-transition: all 0.5s ease-in-out;
+	-moz-transition: all 0.5s ease-in-out;
+	-ms-transition: all 0.5s ease-in-out;
+	-o-transition: all 0.5s ease-in-out;
+	transition: all 0.5s ease-in-out;
+}
+.scroll-top-wrapper:hover {
+	background-color: transparent;
+}
+.scroll-top-wrapper.show {
+    visibility:visible;
+    cursor:pointer;
+	opacity: 1.0;
+}
+.scroll-top-wrapper i.fa {
+	line-height: inherit;
+}
+.fa-arrow-circle-up
+{
+	color: #ff0066;
+}
+/*scroll stop*/
+
+/*navbar*/
+.navbar {
+	background: rgba(0,0,0,0.8); 
+	-moz-box-shadow: 1px -8px 37px #000000;
+    -webkit-box-shadow: 1px -8px 37px #000000;
+box-shadow: 1px -8px 37px #000000;
+
+}
+/**/
+.jumbotron {
+-webkit-animation: cssAnimation 5.0000s 16 linear;
+-moz-animation: cssAnimation 5.0000s 16 linear;
+-o-animation: cssAnimation 5.0000s 16 linear;
+}
+@-webkit-keyframes cssAnimation {
+from { -webkit-transform: rotate(0deg) scale(1) skew(0deg) translate(10px); }
+to { -webkit-transform: rotate(0deg) scale(0.467) skew(0deg) translate(7px); }
+}
+@-moz-keyframes cssAnimation {
+from { -moz-transform: rotate(0deg) scale(1) skew(0deg) translate(10px); }
+to { -moz-transform: rotate(0deg) scale(0.467) skew(0deg) translate(7px); }
+}
+@-o-keyframes cssAnimation {
+from { -o-transform: rotate(0deg) scale(1) skew(0deg) translate(10px); }
+to { -o-transform: rotate(0deg) scale(0.467) skew(0deg) translate(7px); }
+}
+
+.ghost-button
+{
+	border: 5px solid #330033;
+	width: 40%;
+	padding: 30px 30px 30px 30px;
+	margin: 20px 20px 20px 20px;
+	background: transparent;
+	color: #330033;
+	-webkit-transition: border 1s, background 1s, color 1s, ease-in-out;
+	-moz-transition: border 1s, background 1s, color 1s, ease-in-out;
+	transition: border 1s, background 1s, color 1s, ease-in-out;
+}
+.ghost-button:hover
+{
+	border: 5px solid transparent;
+	border-width : 5px 5px 5px 5px;
+	background: linear-gradient(to right, #330033 , #262673);
+	color: #fff;
+	
 }

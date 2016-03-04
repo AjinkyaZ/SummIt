@@ -6,6 +6,7 @@ import json
 import pymongo as pm
 from hashlib import md5
 import textrank
+import parser
 
 
 def todb_article(source_feed, num_articles):
@@ -22,48 +23,30 @@ def todb_article(source_feed, num_articles):
         titles[article_num] = parsed_article.h1.text
         article_title = titles[article_num]
         article_id = md5(article_title).hexdigest()
-        if "cnn.com" in article_link:
-            article_src = "CNN"
-            try:
-                image_set = parsed_article.find(
-                    'img', attrs={'class': 'media__image'})
-                image_src = image_set['src']
-                if "data:image/gif;base64" in image_src:
-                     image_src = image_set['data-src-medium']
-            except KeyError, e:
-                image_src = 'default.png'
-            except TypeError, e:
-                image_src = 'default.png'
-            container = parsed_article.find(
-                'div', attrs={'class': 'l-container'})
-            article_body = ["".join(x.findAll(text=True)) for x in container.findAllNext(
-                "p", attrs={'class': 'zn-body__paragraph'})]
-        
-        elif "reuters.com" in article_link:
-            article_src = "Reuters"
-            container = parsed_article.find(
-                'span', attrs={'id': 'articleText'})
-            article_body = ["".join(x.findAll(text=True))
-                            for x in container.findAllNext("p")]
-            try:
-                image_cont = parsed_article.find('div', {'class':'related-photo-container'})
-                image_tag = image_cont.find('img')
-                image_src = image_tag['src']
-            except KeyError, e:
-                image_src = 'default.png'
-            except TypeError, e:
-                image_src = 'default.png'
+
+        display_data = parser.get_article_data(article_link, parsed_article)
+        article_src = display_data[0]
+        article_body = display_data[1]
+        image_src = display_data[2]
 
         if len(article_body) < 10:  # article is too short
             print "length of article insufficient"
             continue
 
-        body_text_str = ' '.join(article_body)
+        body_text_str = (" ").join(article_body)
         #body_text_final = body_text_str.encode("utf-8")
         article_summary = textrank.gen_summary(body_text_str, article_title)
         #if summary is too short, skip article
         if len(article_summary) < 200:
+            print "summary too short"
             continue
+        if len(article_summary) > 1200:
+            print "summary too long"
+            continue
+
+        len_body_words = textrank.tokencount(body_text_str)
+        len_summary_words = textrank.tokencount(article_summary)
+        compression_ratio = (len_body_words-len_summary_words)/(len_body_words*1.0)
         # for i in range(15):
         #   article_text[article_num][i]=parsed_article.p.text
         #   print article_text[article_num][i]
@@ -72,7 +55,10 @@ def todb_article(source_feed, num_articles):
             'ID': article_id,
             'Title': article_title,
             'Body': article_body,
+            'Body_Length': len_body_words,
             'Summary': article_summary,
+            'Summary_Length': len_summary_words,
+            'Compression_Ratio': compression_ratio,
             'Link': article_link,
             'Source': article_src,
             'Image': image_src,
@@ -84,14 +70,14 @@ def main():
     # News sources
     #cnn_top = feedparser.parse('http://rss.cnn.com/rss/edition.rss')
     cnn_world = feedparser.parse('http://rss.cnn.com/rss/edition_world.rss')
-    cnn_tech = feedparser.parse(
-        'http://rss.cnn.com/rss/edition_technology.rss')
+    #cnn_tech = feedparser.parse('http://rss.cnn.com/rss/edition_technology.rss')
     reuters_top = feedparser.parse('http://feeds.reuters.com/reuters/INtopNews')
     #cnn_sport = feedparser.parse('http://rss.cnn.com/rss/edition_sport.rss')
     toi_india = feedparser.parse('http://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms')
+    nytimes_world = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/World.xml')
 
     # Main code starts here
-    src_feed = cnn_tech
+    #src_feed = cnn_tech
     start = datetime.now()
 
     client = pm.MongoClient('localhost', 3001)
@@ -100,22 +86,26 @@ def main():
     db.articles.remove({})
     print db.collection_names()
     # print "Source Feed ", src_feed
-    sources = [reuters_top, cnn_world, cnn_tech]
+    sources = [cnn_world, reuters_top]
+    insertcount = 0
     for src_feed in sources:
         len_src_feed = len(src_feed['entries'])
         print "No. of articles in source feed", len_src_feed
         #print "Enter no. of articles to parse, must be less than", len_src_feed
         #n = int(raw_input())
-        n=6
+        n=15
         for article in todb_article(src_feed, n):
             article_id = articles.insert_one(article).inserted_id
+            insertcount += 1
             print "inserting into db"
             print article['ID']
             print article['Title']
             print article['Image']
             # print article_id
             # print articles.find_one(article_id)
-    print datetime.now()-start
+    print "Articles parsed : ", n*len(sources)
+    print "Articles fetched : ", insertcount
+    print "Time taken :", datetime.now()-start
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
-from nltk.tokenize.punkt import PunktSentenceTokenizer
+from nltk.tokenize.punkt import PunktSentenceTokenizer, PunktParameters
+import nltk.data
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 from nltk.corpus import stopwords
@@ -42,16 +43,18 @@ def getsortedsents(inputscores):
 
 
 def textrank(doc, title):
-    if "(CNN)" in doc:
-       doc = doc.strip("(CNN)") #remove that irritating (CNN) tag
-    pstoken = PunktSentenceTokenizer()
-    doclist = pstoken.tokenize(doc) #split into sentences
+    #psparams = PunktParameters()
+    #psparams.abbrev_types = set(['dr','mr','mrs', 'ms','cpt','U.S.','U.K.'])
+    sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
+    #pstoken = PunktSentenceTokenizer(psparams)
+    doclist = sent_detector.tokenize(doc) #split into sentences
     doclist.append(title) #append title to list for additional info
     n = len(doclist)
     #for i in range(n):
     #    print i, "-->", doclist[i]
     #print "\n\n"
     stoplist = stopwords.words('english')
+    punclist = [',','.',':',';','\'','"','?','``','\'\'','\'s']
     #print stoplist, "\n\n"
     doclist_nostop = doclist[:]  #create working copy of doclist
     removed_stops = doclist[:]
@@ -59,7 +62,7 @@ def textrank(doc, title):
     #the sentences were split into separate terms and reconstructed without stopwords
     #stopword removal is significantly affecting performance (better summaries!)
     for i in range(n):
-        doclist_nostop[i] = [term for term in doclist[i].split() if term.lower() not in stoplist]
+        doclist_nostop[i] = [term for term in doclist[i].split() if term.lower() not in stoplist and term not in punclist]
         doclist_nostop[i] = (' ').join(doclist_nostop[i])
         removed_stops[i] = [term for term in doclist[i].split() if term.lower() in stoplist]
         removed_stops[i] = (' ').join(removed_stops[i])
@@ -83,19 +86,25 @@ def textrank(doc, title):
 
 
 
-def textrank_tfidf(doc):
+def textrank_tfidf(doc, title):
     # print doc
     tokenizer = PunktSentenceTokenizer()
     # print "Tokenizer, ", tokenizer
-    docterms = word_tokenize(doc)
-    stoplist = stopwords.words('english')
-    docterms_nostop = [term.lower() for term in docterms if term not in stoplist]
+    #docterms = word_tokenize(doc)
     doclist = tokenizer.tokenize(doc)
+    doclist.append(title)
+    n = len(doclist)
+    stoplist = stopwords.words('english')
+    punclist = [',','.',':',';','\'','"','?','``','\'\'','\'s']
+    doclist_nostop = [0 for i in range(n)]
+    for i in range(n):
+        doclist_nostop[i] = [term for term in doclist[i].split() if term.lower() not in stoplist and term not in punclist]
+        doclist_nostop[i] = (' ').join(doclist_nostop[i])
     #print docterms_nostop
     # print "Doc list: ", doclist
     vectorizer = TfidfVectorizer()
     # print "Vectorizer:", vectorizer
-    docvectors = vectorizer.fit_transform(doclist)
+    docvectors = vectorizer.fit_transform(doclist_nostop)
     # print "Docvectors", docvectors
     # print "Docvectors array", docvectors.toarray()
     docmatrix = docvectors*docvectors.T
@@ -104,17 +113,12 @@ def textrank_tfidf(doc):
     docgraph = nx.from_scipy_sparse_matrix(docmatrix)
     # print docgraph
     scores = nx.pagerank(docgraph)
-    n = len(scores)
-    scorelist = []
-    for i in range(n):
-        scorelist.append((i, scores[i]))
-    scoressorted = sorted(scorelist, key=lambda x: x[1], reverse=True)
-    sortedsents = [scoressorted[i][0] for i in range(n)]
+    sortedsents = getsortedsents(scores)
     return (sortedsents, doclist)
 
 
-def gen_summary(docu, title):
-    textrankres = textrank(docu, title)
+def gen_summary(doc, title):
+    textrankres = textrank(doc, title)
     summindices = textrankres[0]
     summsents = textrankres[1]
     summary = ""
@@ -129,9 +133,18 @@ def gen_summary(docu, title):
         return summary
 
 
+def tokencount(text):
+    text_tokens = word_tokenize(text)
+    punclist = [',','.',':',';','\'','"','?','``','\'\'','\'s']
+    text_tokens_nopunc = [term for term in text_tokens if term not in punclist]
+    return len(text_tokens_nopunc)
+
+
 def main():
     text = """(CNN)After eluding capture for years, two Mafia bosses have been arrested in an underground bunker in southern Italy.   Police seized mobsters Giuseppe Ferraro, 47, and Giuseppe Crea, 37,  in Calabria region Friday, according to Italian news agency Ansa.  Ferraro was found guilty of murder and Mafia association decades ago, and had been a fugitive since 1998. Crea was convicted of Mafia association and had been on the run for nine years, according to the news agency. Their hideout had an array of weapons, including rifles, pistols and machine guns. "Today is another great day for everyone and for the country because justice has won," Interior Minister Angelino Alfano said after their arrest.  Beyond Italian borders The two men are part of 'Ndrangheta, a dangerous criminal organization that has tentacles worldwide. The group is based in Calabria, where the two men were arrested.   'Ndrangheta's power has grown beyond Italian borders.  Two years ago, Italian officials said the group is linked to drug trafficking  in South and Central America, Canada and the United States.  The 'Ndrangheta was formed in the 1860s, and is involved in kidnappings, corruption, drug trafficking, gambling and murders, according to the FBI.  It has between 100-200 members in the United States, mostly in New York and Florida.  Opinion: Will Mafia ever loosen its grip on Italy? """
     title = """Italian police arrest 2 fugitive Mafia bosses in underground bunker"""
+    #text = raw_input("Enter body text\n")
+    #title = raw_input("Enter title\n")
     print "Article text"
     print text
     print "Summary\n"

@@ -2,15 +2,91 @@
   <title>fyproject-meteor</title>
   <link href='http://fonts.googleapis.com/css?family=Oswald|Bitter' rel='stylesheet' type='text/css'>
   <link href='bootstrap.min.css'>
+ <link rel="stylesheet" id="font-awesome-css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" type="text/css" media="screen">
+<!--scroll function-->
+
+<script><!--jquery-->
+$(function(){
+ 
+	$(document).on( 'scroll', function(){
+ 
+		if ($(window).scrollTop() > 100) {
+			$('.scroll-top-wrapper').addClass('show');
+		} else {
+			$('.scroll-top-wrapper').removeClass('show');
+		}
+	});
+ 
+	$('.scroll-top-wrapper').on('click', scrollToTop);
+});
+ 
+function scrollToTop() {
+	verticalOffset = typeof(verticalOffset) != 'undefined' ? verticalOffset : 0;
+	element = $('body');
+	offset = element.offset();
+	offsetTop = offset.top;
+	$('html, body').animate({scrollTop: offsetTop}, 500, 'linear');
+}
+</script>
+
 </head>
 
 <body>
+<!--navigation bar part-->
+
+<nav class="navbar navbar-inverse navbar-fixed-top " data-spy="affix" data-offset-top="100"  id="my-nav">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mynavbar-collapse">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			</button> <!--Button end-->
+		 <a href="#home" class="navbar-brand" style="color:#ADFF2F">SUM-it!</a>
+		</div> <!-- div navbar header -->
+	<div class="navbar-collapse collapse" id="mynavbar-collapse">
+
+	<ul class="nav navbar-nav navbar-right">
+		<li><a href="#home">Home</a></li>
+		<li><a href="#about">About</a></li>
+
+	</ul>
+		</div> <!--div navbar content end-->
+	</div> <!--div container end-->
+</nav> <!--nav end-->
+<!--Jumbotron title part-->
+
+<div class="jumbotron" id="home" style="background:transparent">
+<div class="container text-center">
+<br>
+<h1 style="color:#ADFF2F;text-shadow:1px 1px 0px black;text-outline: 2px 2px #7FFFD4;"><b>SUMM-IT!</b></h1>
+<h3 style="color:#000">Your daily news articles summarized</h3>
+</div> <!--text div end-->
+</div> <!--div jumbotron-->
+
 <div class = 'container-fluid'>
    {{> viewArticles}}
 </div>
-<!--<script src = 'jquery.min.js'></script>
-<script src='bootstrap.min.js'></script>-->
-</body>
+
+  <footer>
+	<p style="font-family: Roboto Condensed; color: #ff0066">© Copyright 2016 Summ-It</p>
+  <p style= "font-family: Roboto Condensed">Disclaimer: article contents are the sole property of the publishing party </p>
+  </footer>
+<!--footer ends-->
+<!--scroll up button-->
+<div class="scroll-top-wrapper">
+    <span class="scroll-top-inner">
+        <i class="fa fa-4x fa-arrow-circle-up"></i>
+    </span>
+</div>
+<!--scroll up button end -->
+	
+<script src = 'jquery.min.js'></script>
+<script src='bootstrap.min.js'></script>
+</body> 
+<!--=====================End===============-->
+
 
 <template name="viewArticles">
        <!-- Iterate on all Objects fetched by the Helper Class-->
@@ -18,15 +94,15 @@
          <div class='row'>
          <center>
          <div class='art_unit'>
-         <div class="row">
+         <div class="row art_header">
          <div class='col-lg-4 col-md-4 col-sm-12  unit_imagediv'>
          <img class = 'img-responsive art_image' src={{Image}}>
          </div>
          <div class='col-lg-8 col-md-8 col-sm-12  unit_contentdiv'>
          <h2 style="font-size: 1.25em;"> {{Title}} </h2>
-	       <span><a href={{Link}} style="font-size: 0.75em;">Read original article</a></span>
-         <span style = "font-size: 0.75em;"> &nbsp;&nbsp;&nbsp;{{Source}} </span>
-         <span style = "font-size: 0.75em;"> &nbsp;&nbsp;&nbsp;{{ Date }} </span>
+	       <span><a href={{Link}} style="font-size: 0.8em;">Read original article</a></span>
+         <span style = "font-size: 0.8em;"> &nbsp;&nbsp;&nbsp;{{Source}} </span>
+         <span style = "font-size: 0.8em;"> &nbsp;&nbsp;&nbsp;{{ Date }} </span>
          </div>
          </div>
          <div class="row unit_bodydiv">
@@ -34,17 +110,14 @@
           {{Summary}}
           </p>
          </div>
-         <div class="row banner">
-           
+         <div class="row banner">          
          </div>
-         <!--<div class='row'>
-         <div class = 'col-lg-8 col-md-8 col-sm-6 unit_contentdiv'>
-         {{Body}}
-         </div>
-         </div>-->
          </div><!--art_unit1 closed-->
          </center>
          </div><!--row closed-->
 
        {{/each}}
+       <div class="container" align="center">
+       <button class="btn ghost-button"><i class="fa fa-angle-double-down fa-4x"></i></button>
+       </div>
    </template>
