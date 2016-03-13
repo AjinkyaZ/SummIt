@@ -17,6 +17,7 @@ if (Meteor.isClient) {
       handle.loadNextPage();
     }
   })
+
 }
 
 if (Meteor.isServer) {

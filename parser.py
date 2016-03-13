@@ -25,7 +25,11 @@ def get_article_data(link, bs_article_object):
             if "(CNN)" in body_text[sent_index]:
                 body_text[sent_index] = string.replace(body_text[sent_index], "(CNN)", "")
             if "READ:" in body_text[sent_index]:
-                continue
+                body_text[sent_index] = string.replace(body_text[sent_index], "READ:", "")
+            if "MORE:" in body_text[sent_index]:
+                body_text[sent_index] = string.replace(body_text[sent_index], "MORE:", "")
+            if "Read more:" in body_text[sent_index]:
+                body_text[sent_index] = string.replace(body_text[sent_index], "Read more:", "")
         try:
             image_set = bs_article_object.find(
                 'img', {'class': 'media__image'})
@@ -60,14 +64,15 @@ def get_article_data(link, bs_article_object):
         except AttributeError, e:
             image_source = 'default.png'
 
-    elif "nytimes.com" in link:
-        source = "NY Times"
-        container = bs_article_object.find('div', {'class':'story-body'})
-        body_text = [" ".join(x.findAll(text=True)) for x in container.findAllNext("p")]
+    elif "economictimes.indiatimes" in link:
+        source = "Economic Times"
+        container = bs_article_object.find('div', {'class': 'Normal'})
+        article_text = container.text
+        body_text = splitsentences(article_text)
         try:
-            image_cont = bs_article_object.find('div',{'class':'image'})
+            image_cont = bs_article_object.find('figure')
             image_tag = image_cont.find('img')
-            image_src = image_tag['data-mediaviewer-src']
+            image_source = image_tag['src']
         except KeyError, e:
             image_source = 'default.png'
         except TypeError, e:

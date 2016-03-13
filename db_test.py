@@ -36,12 +36,11 @@ def main():
         summary = article['Summary']
         summary = summary.encode("utf-8")
         print "Summary : ", summary
-        print "Length of Body (chars) : ", len(body_text_final)
-        print "Length of Summary (chars) : ", len(summary)
-        reduced_words = len(body_text_final)-len(summary)
-        cur_compression_ratio = (reduced_words*1.0)/len(body_text_final)*100
-        total_compression_ratio += cur_compression_ratio
-        print("Compression achieved : {0:.2f}%").format(cur_compression_ratio)
+        print "Length of Body (chars) : ", article['Body_Length']
+        print "Length of Summary (chars) : ", article['Summary_Length']
+ 
+        total_compression_ratio += article['Compression_Ratio']
+        print("Compression achieved : {0:.2f}%").format(article['Compression_Ratio']*100)
         print "--------------------------------"
         print "Link : ", article['Link']
         print "Source : ", article['Source']
@@ -49,7 +48,8 @@ def main():
         print "Date : ", article['Date']
         print ""
         processed_articles +=1
-    print "Average Compression achieved : ", (total_compression_ratio/processed_articles)
+    print "Articles in database :", processed_articles
+    print("Average Compression achieved : {0:.2f}%").format((total_compression_ratio/processed_articles)*100)
 
 
 if __name__ == "__main__":

@@ -2,6 +2,8 @@
   <title>fyproject-meteor</title>
   <link href='http://fonts.googleapis.com/css?family=Oswald|Bitter' rel='stylesheet' type='text/css'>
   <link href='bootstrap.min.css'>
+  <link href='https://fonts.googleapis.com/css?family=Quicksand:400,700|Viga' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed' rel='stylesheet' type='text/css'>
  <link rel="stylesheet" id="font-awesome-css" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" type="text/css" media="screen">
 <!--scroll function-->
 
@@ -34,7 +36,7 @@ function scrollToTop() {
 <body>
 <!--navigation bar part-->
 
-<nav class="navbar navbar-inverse navbar-fixed-top " data-spy="affix" data-offset-top="100"  id="my-nav">
+<nav class="navbar navbar-inverse navbar-fixed-top " data-spy="affix" data-offset-top="100"  id="my-nav" style="background:linear-gradient(-45deg, rgba(52,143,109,1) 0%, rgba(63,94,133,1) 100%);height: 70px">
 	<div class="container">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mynavbar-collapse">
@@ -43,13 +45,13 @@ function scrollToTop() {
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 			</button> <!--Button end-->
-		 <a href="#home" class="navbar-brand" style="color:#ADFF2F">SUM-it!</a>
+		 <a href="#home" class="navbar-brand summnav" style="font-size: 30px"><b style="color:#33ffad">Summ</b><b style="color:#00b3b3">-</b><b style="color:#e6ffff">it</b></a>
 		</div> <!-- div navbar header -->
 	<div class="navbar-collapse collapse" id="mynavbar-collapse">
 
 	<ul class="nav navbar-nav navbar-right">
-		<li><a href="#home">Home</a></li>
-		<li><a href="#about">About</a></li>
+		<li><a href="#home" style="color:#ffff99;font-size:20px;font-family: 'Viga', sans-serif">Home</a></li>
+		<li><a href="#about" style="color:#ffff99;font-size:20px;font-family: 'Viga', sans-serif">About</a></li>
 
 	</ul>
 		</div> <!--div navbar content end-->
@@ -57,11 +59,11 @@ function scrollToTop() {
 </nav> <!--nav end-->
 <!--Jumbotron title part-->
 
-<div class="jumbotron" id="home" style="background:transparent">
+<div class="jumbotron" id="home" style="background:transparent;">
 <div class="container text-center">
 <br>
-<h1 style="color:#ADFF2F;text-shadow:1px 1px 0px black;text-outline: 2px 2px #7FFFD4;"><b>SUMM-IT!</b></h1>
-<h3 style="color:#000">Your daily news articles summarized</h3>
+<h1 class="summjumb" style="text-shadow:3px 3px 50px black;text-outline: 3px 3px #7FFFD4;"><b style="color:#33ffad">Summ</b><b style="color:#00b3b3">-</b><b style="color:#e6ffff">it</b></h1>
+<h3 style="color:#ffff99;text-shadow:-3px 3px 50px black;text-stroke:5px #002266">Your daily news articles summarized</h3>
 </div> <!--text div end-->
 </div> <!--div jumbotron-->
 
@@ -70,8 +72,12 @@ function scrollToTop() {
 </div>
 
   <footer>
-	<p style="font-family: Roboto Condensed; color: #ff0066">© Copyright 2016 Summ-It</p>
-  <p style= "font-family: Roboto Condensed">Disclaimer: article contents are the sole property of the publishing party </p>
+  <div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12">
+	<p style="font-family: Roboto Condensed; color:#33ffad; font-size: 25px;"><b>© Copyright 2016 Summ-it</b></p>
+  <p style= "font-family: Roboto Condensed;color:#ffff99; font-size: 25px;">Disclaimer: The contents of the articles are the sole property of the publishing party.</p>
+  </div>
+  </div>
   </footer>
 <!--footer ends-->
 <!--scroll up button-->
@@ -99,8 +105,8 @@ function scrollToTop() {
          <img class = 'img-responsive art_image' src={{Image}}>
          </div>
          <div class='col-lg-8 col-md-8 col-sm-12  unit_contentdiv'>
-         <h2 style="font-size: 1.25em;"> {{Title}} </h2>
-	       <span><a href={{Link}} style="font-size: 0.8em;">Read original article</a></span>
+         <h2 style="font-size: 1.25em;color: #ffff99"> {{Title}} </h2>
+	       <span><a href={{Link}} style="font-size: 0.8em;color: #33ffad">Read original article</a></span>
          <span style = "font-size: 0.8em;"> &nbsp;&nbsp;&nbsp;{{Source}} </span>
          <span style = "font-size: 0.8em;"> &nbsp;&nbsp;&nbsp;{{ Date }} </span>
          </div>
@@ -117,7 +123,9 @@ function scrollToTop() {
          </div><!--row closed-->
 
        {{/each}}
-       <div class="container" align="center">
+       <div class = "container" align="center">
+      
        <button class="btn ghost-button"><i class="fa fa-angle-double-down fa-4x"></i></button>
+       
        </div>
    </template>

@@ -22,6 +22,7 @@ def todb_article(source_feed, num_articles):
         parsed_article = bs4.BeautifulSoup(article_main, 'html.parser')
         titles[article_num] = parsed_article.h1.text
         article_title = titles[article_num]
+        article_title = article_title.encode("utf-8")
         article_id = md5(article_title).hexdigest()
 
         display_data = parser.get_article_data(article_link, parsed_article)
@@ -73,9 +74,7 @@ def main():
     #cnn_tech = feedparser.parse('http://rss.cnn.com/rss/edition_technology.rss')
     reuters_top = feedparser.parse('http://feeds.reuters.com/reuters/INtopNews')
     #cnn_sport = feedparser.parse('http://rss.cnn.com/rss/edition_sport.rss')
-    toi_india = feedparser.parse('http://timesofindia.indiatimes.com/rssfeeds/-2128936835.cms')
-    nytimes_world = feedparser.parse('http://rss.nytimes.com/services/xml/rss/nyt/World.xml')
-
+    et_top = feedparser.parse('http://economictimes.indiatimes.com/rssfeedstopstories.cms')
     # Main code starts here
     #src_feed = cnn_tech
     start = datetime.now()
@@ -93,7 +92,7 @@ def main():
         print "No. of articles in source feed", len_src_feed
         #print "Enter no. of articles to parse, must be less than", len_src_feed
         #n = int(raw_input())
-        n=15
+        n=len_src_feed
         for article in todb_article(src_feed, n):
             article_id = articles.insert_one(article).inserted_id
             insertcount += 1

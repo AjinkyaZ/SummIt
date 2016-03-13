@@ -1,6 +1,8 @@
 from nltk.tokenize.punkt import PunktSentenceTokenizer, PunktParameters
 import nltk.data
 from nltk.tokenize import word_tokenize
+from nltk.stem.snowball import SnowballStemmer
+from stemming.porter2 import stem
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 from nltk.corpus import stopwords
 from collections import Counter
@@ -50,11 +52,12 @@ def textrank(doc, title):
     doclist = sent_detector.tokenize(doc) #split into sentences
     doclist.append(title) #append title to list for additional info
     n = len(doclist)
+    stemmer = SnowballStemmer("english")
     #for i in range(n):
     #    print i, "-->", doclist[i]
     #print "\n\n"
     stoplist = stopwords.words('english')
-    punclist = [',','.',':',';','\'','"','?','``','\'\'','\'s']
+    punclist = [',', '.', ':', ';', '\'', '"', '?', '!', '``', '\'\'', '\'s', '``', '(', ')']
     #print stoplist, "\n\n"
     doclist_nostop = doclist[:]  #create working copy of doclist
     removed_stops = doclist[:]
@@ -62,7 +65,7 @@ def textrank(doc, title):
     #the sentences were split into separate terms and reconstructed without stopwords
     #stopword removal is significantly affecting performance (better summaries!)
     for i in range(n):
-        doclist_nostop[i] = [term for term in doclist[i].split() if term.lower() not in stoplist and term not in punclist]
+        doclist_nostop[i] = [stem(term.lower()) for term in doclist[i].split() if term.lower() not in stoplist and term not in punclist]
         doclist_nostop[i] = (' ').join(doclist_nostop[i])
         removed_stops[i] = [term for term in doclist[i].split() if term.lower() in stoplist]
         removed_stops[i] = (' ').join(removed_stops[i])
@@ -88,21 +91,23 @@ def textrank(doc, title):
 
 def textrank_tfidf(doc, title):
     # print doc
-    tokenizer = PunktSentenceTokenizer()
+    #tokenizer = PunktSentenceTokenizer()
     # print "Tokenizer, ", tokenizer
     #docterms = word_tokenize(doc)
-    doclist = tokenizer.tokenize(doc)
+    sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
+    stemmer = SnowballStemmer("english")
+    doclist = sent_detector.tokenize(doc)
     doclist.append(title)
     n = len(doclist)
     stoplist = stopwords.words('english')
-    punclist = [',','.',':',';','\'','"','?','``','\'\'','\'s']
+    punclist = [',','.',':',';','\'','"','?','``','\'\'','\'s','(',')',"``","`","[","]"]
     doclist_nostop = [0 for i in range(n)]
     for i in range(n):
-        doclist_nostop[i] = [term for term in doclist[i].split() if term.lower() not in stoplist and term not in punclist]
+        doclist_nostop[i] = [stem(term.lower()) for term in doclist[i].split() if term.lower() not in stoplist and term not in punclist]
         doclist_nostop[i] = (' ').join(doclist_nostop[i])
     #print docterms_nostop
     # print "Doc list: ", doclist
-    vectorizer = TfidfVectorizer()
+    vectorizer = TfidfVectorizer(tokenizer = word_tokenize, stop_words=stoplist, ngram_range=(1,2), norm='l2')
     # print "Vectorizer:", vectorizer
     docvectors = vectorizer.fit_transform(doclist_nostop)
     # print "Docvectors", docvectors
@@ -118,12 +123,12 @@ def textrank_tfidf(doc, title):
 
 
 def gen_summary(doc, title):
-    textrankres = textrank(doc, title)
+    textrankres = textrank_tfidf(doc, title)
     summindices = textrankres[0]
     summsents = textrankres[1]
     summary = ""
     #d = int(raw_input("enter summary len in sentences\n"))
-    d = 3
+    d = 4
     if d > len(summsents):
         print "Invalid"
     else:
@@ -141,7 +146,7 @@ def tokencount(text):
 
 
 def main():
-    text = """(CNN)After eluding capture for years, two Mafia bosses have been arrested in an underground bunker in southern Italy.   Police seized mobsters Giuseppe Ferraro, 47, and Giuseppe Crea, 37,  in Calabria region Friday, according to Italian news agency Ansa.  Ferraro was found guilty of murder and Mafia association decades ago, and had been a fugitive since 1998. Crea was convicted of Mafia association and had been on the run for nine years, according to the news agency. Their hideout had an array of weapons, including rifles, pistols and machine guns. "Today is another great day for everyone and for the country because justice has won," Interior Minister Angelino Alfano said after their arrest.  Beyond Italian borders The two men are part of 'Ndrangheta, a dangerous criminal organization that has tentacles worldwide. The group is based in Calabria, where the two men were arrested.   'Ndrangheta's power has grown beyond Italian borders.  Two years ago, Italian officials said the group is linked to drug trafficking  in South and Central America, Canada and the United States.  The 'Ndrangheta was formed in the 1860s, and is involved in kidnappings, corruption, drug trafficking, gambling and murders, according to the FBI.  It has between 100-200 members in the United States, mostly in New York and Florida.  Opinion: Will Mafia ever loosen its grip on Italy? """
+    text = """(CNN)After eluding capture for years, two Mafia bosses have been arrested in an underground bunker in southern Italy.   Police seized mobsters Giuseppe Ferraro, 47, and Giuseppe Crea, 37,  in Calabria region Friday, according to Italian news agency Ansa. Ferraro was found guilty of murder and Mafia association decades ago, and had been a fugitive since 1998. Crea was convicted of Mafia association and had been on the run for nine years, according to the news agency. Their hideout had an array of weapons, including rifles, pistols and machine guns. "Today is another great day for everyone and for the country because justice has won," Interior Minister Angelino Alfano said after their arrest.  Beyond Italian borders The two men are part of 'Ndrangheta, a dangerous criminal organization that has tentacles worldwide. The group is based in Calabria, where the two men were arrested.   'Ndrangheta's power has grown beyond Italian borders.  Two years ago, Italian officials said the group is linked to drug trafficking  in South and Central America, Canada and the United States.  The 'Ndrangheta was formed in the 1860s, and is involved in kidnappings, corruption, drug trafficking, gambling and murders, according to the FBI.  It has between 100-200 members in the United States, mostly in New York and Florida.  Opinion: Will Mafia ever loosen its grip on Italy? """
     title = """Italian police arrest 2 fugitive Mafia bosses in underground bunker"""
     #text = raw_input("Enter body text\n")
     #title = raw_input("Enter title\n")

@@ -2,8 +2,10 @@
 body 
 {
 	font-family: 'Oswald', sans-serif;
-	background: #e6e6e6;
-	
+	background-image:url("abc.jpg");
+	background-attachment:fixed;
+	 background-size:cover;
+
 }
 p
 {
@@ -70,7 +72,7 @@ a:link, a:visited
 }
 .art_header
 {
-	background: linear-gradient(to right, #330033 , #262673);
+	background-color: rgba(63,94,133,1);
 	color: #fff;
 }
 .unit_imagediv
@@ -115,12 +117,13 @@ span>a:link, span>a:visited
 }
 footer
 {
-	height: 200px;
+	height: 150px;
 	padding: 50px 50px 50px 50px;
-	background:linear-gradient(to right, #330033 , #262673);
+	background:linear-gradient(-45deg, rgba(52,143,109,1) 0%, rgba(63,94,133,1) 100%);
 	color: #fff;
 	margin-top: 50px;
 	bottom: 0px;
+	font-family: 'Roboto Condensed', sans-serif;
 }
 
 
@@ -164,7 +167,8 @@ footer
 }
 .fa-arrow-circle-up
 {
-	color: #ff0066;
+	color: #ffff99;
+
 }
 /*scroll stop*/
 
@@ -174,44 +178,37 @@ footer
 	-moz-box-shadow: 1px -8px 37px #000000;
     -webkit-box-shadow: 1px -8px 37px #000000;
 box-shadow: 1px -8px 37px #000000;
-
+padding: 10px;
 }
 /**/
 .jumbotron {
--webkit-animation: cssAnimation 5.0000s 16 linear;
--moz-animation: cssAnimation 5.0000s 16 linear;
--o-animation: cssAnimation 5.0000s 16 linear;
-}
-@-webkit-keyframes cssAnimation {
-from { -webkit-transform: rotate(0deg) scale(1) skew(0deg) translate(10px); }
-to { -webkit-transform: rotate(0deg) scale(0.467) skew(0deg) translate(7px); }
-}
-@-moz-keyframes cssAnimation {
-from { -moz-transform: rotate(0deg) scale(1) skew(0deg) translate(10px); }
-to { -moz-transform: rotate(0deg) scale(0.467) skew(0deg) translate(7px); }
-}
-@-o-keyframes cssAnimation {
-from { -o-transform: rotate(0deg) scale(1) skew(0deg) translate(10px); }
-to { -o-transform: rotate(0deg) scale(0.467) skew(0deg) translate(7px); }
+
 }
 
 .ghost-button
 {
-	border: 5px solid #330033;
-	width: 40%;
+	border: 4px solid #ffff99;
+	width: 100%;
 	padding: 30px 30px 30px 30px;
-	margin: 20px 20px 20px 20px;
+	margin: ;
 	background: transparent;
-	color: #330033;
+	color: #ffff99;
 	-webkit-transition: border 1s, background 1s, color 1s, ease-in-out;
 	-moz-transition: border 1s, background 1s, color 1s, ease-in-out;
 	transition: border 1s, background 1s, color 1s, ease-in-out;
 }
 .ghost-button:hover
 {
-	border: 5px solid transparent;
-	border-width : 5px 5px 5px 5px;
-	background: linear-gradient(to right, #330033 , #262673);
+	border: 4px solid transparent;
+	border-width : 4px 4px 4px 4px;
+	background-color:#00e68a;
 	color: #fff;
 	
 }
+.summnav{
+	font-family: 'Viga', sans-serif;
+}
+.summjumb{
+	font-family: 'Viga', sans-serif;
+}
+
