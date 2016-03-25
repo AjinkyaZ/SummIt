@@ -1,19 +1,27 @@
-import bs4
+### Libraries
+# Standard library
 import string
+
+# Third-party libraries
+import bs4
 from nltk.tokenize.punkt import PunktSentenceTokenizer, PunktParameters
 import nltk.data
 
 
 def splitsentences(text):
-    #tknz_params = PunktParameters()
-    #tknz_params.abbrev_types = set(['dr','mr','mrs', 'ms','cpt','U.S.','U.K.'])
-    #tknz = PunktSentenceTokenizer(tknz_params)
+    # tknz_params = PunktParameters()
+    # tknz_params.abbrev_types = set(['dr','mr','mrs', 'ms','U.S.','U.K.'])
+    # tknz = PunktSentenceTokenizer(tknz_params)
     sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
     sents = sent_detector.tokenize(text)
     return sents
 
 
 def get_article_data(link, bs_article_object):
+    """Parses each article, given a BeautifulSoup article object (html).
+    Returns source name, article body text and url to main image,
+    following rules corresponding to source URL
+    """
     print link
     if "cnn.com" in link:
         source = "CNN"
@@ -44,7 +52,7 @@ def get_article_data(link, bs_article_object):
     elif "reuters.com" in link:
         source = "Reuters"
         container = bs_article_object.find('span', {'id': 'articleText'})
-        #body_text = ["".join(x.findAll(text=True)) for x in container.findAllNext("p")]
+        # body_text = ["".join(x.findAll(text=True)) for x in container.findAllNext("p")]
         article_text = container.text
         body_text = splitsentences(article_text)
         try:

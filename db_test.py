@@ -1,11 +1,17 @@
-import pymongo as pm
+### Libraries
+# Standard library
 from collections import defaultdict
 import string
 import math
+
+# Third-party libraries
+import pymongo as pm
 from textrank import *
 
 
 def main():
+    """Test program to check/view data stored in the database.
+    """
     client = pm.MongoClient('localhost', 3001)
     db = client.feeds_database
     articles = db.articles

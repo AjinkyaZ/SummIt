@@ -1,3 +1,9 @@
+### Libraries
+# Standard library
+from collections import Counter
+from math import log10, log
+
+# Third-party libraries
 from nltk.tokenize.punkt import PunktSentenceTokenizer, PunktParameters
 import nltk.data
 from nltk.tokenize import word_tokenize
@@ -5,80 +11,90 @@ from nltk.stem.snowball import SnowballStemmer
 from stemming.porter2 import stem
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 from nltk.corpus import stopwords
-from collections import Counter
-from math import log10, log
 from networkx import drawing
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 
-
-
-#def pagerank():
-    # to-do
-
 def similarity(s1, s2):
+    """Calculates similarity between two sentences, by tokenizing them into words
+    and finding intersecting (common) terms. 
+    Returns similarity taking into consideration length of both sentences to
+    account for long sentences with many terms.
+    """
     s1 = s1.split()
-    #print "s1 ---", s1
+    # print "s1 ---", s1
     s2 = s2.split()
-    #print "s2 ---", s2
-    terms_s1 = set(s1) #eliminate duplicates
+    # print "s2 ---", s2
+    terms_s1 = set(s1) # eliminate duplicates
     terms_s2 = set(s2)
-    #print log(len(terms_s1)), log(len(terms_s2))
+    # print log(len(terms_s1)), log(len(terms_s2))
     common_terms = terms_s1.intersection(terms_s2)
-    #print "len comm terms", len(common_terms)
+    # print "len comm terms", len(common_terms)
     if (log(len(terms_s1))+log(len(terms_s2)))==0: sim = 0.001
     else:
         sim = len(common_terms)/(log10(len(terms_s1))+log10(len(terms_s2)))
     return sim
 
 def getsortedsents(inputscores):
+    """Accepts a dictionary consisting of sentence scores ordered by index,
+    return sorted indices with decreasing scores. 
+    """
     n = len(inputscores)
     scorelist = []
     for i in range(n):
-        scorelist.append((i, inputscores[i])) #list of tuples with sentence index and its ranking
+        scorelist.append((i, inputscores[i])) # list of tuples with sentence index and its ranking
     scoressorted = sorted(scorelist, key=lambda x: x[1], reverse=True)
-    #for i in scoressorted: print i
-    sortedsents = [scoressorted[i][0] for i in range(n)] #get sorted sentence indices
-    sortedsents.remove(max(sortedsents)) #remove sentence index corresponding to title, (last since it was appended later)
+    # for i in scoressorted: print i
+    sortedsents = [scoressorted[i][0] for i in range(n)] # get sorted sentence indices
+    sortedsents.remove(max(sortedsents)) # remove sentence index corresponding to title, (last since it was appended later)
     return sortedsents
 
 
 def textrank(doc, title):
-    #psparams = PunktParameters()
-    #psparams.abbrev_types = set(['dr','mr','mrs', 'ms','cpt','U.S.','U.K.'])
+    """TextRank implementation that uses word overlap as similarity measure.
+    Tokenizes document into sentences, appends title as another sentence,
+    and constructs a set of sentences consisting of stemmed words with 
+    stopwords and punctuations stripped.
+    Calculates similarity for each sentence pair, normalized between 0 and 1.
+    After transforming list into a numpy array, converts it to a graph and 
+    applies PageRank to get final scores. 
+    Returns sorted indices and tokenized sentence list.
+    """
+    # psparams = PunktParameters()
+    # psparams.abbrev_types = set(['dr','mr','mrs', 'ms','U.S.','U.K.'])
     sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
-    #pstoken = PunktSentenceTokenizer(psparams)
-    doclist = sent_detector.tokenize(doc) #split into sentences
-    doclist.append(title) #append title to list for additional info
+    # pstoken = PunktSentenceTokenizer(psparams)
+    doclist = sent_detector.tokenize(doc) # split into sentences
+    doclist.append(title) # append title to list for additional info
     n = len(doclist)
     stemmer = SnowballStemmer("english")
-    #for i in range(n):
-    #    print i, "-->", doclist[i]
-    #print "\n\n"
+    # for i in range(n):
+    #     print i, "-->", doclist[i]
+    # print "\n\n"
     stoplist = stopwords.words('english')
     punclist = [',', '.', ':', ';', '\'', '"', '?', '!', '``', '\'\'', '\'s', '``', '(', ')']
-    #print stoplist, "\n\n"
-    doclist_nostop = doclist[:]  #create working copy of doclist
+    # print stoplist, "\n\n"
+    doclist_nostop = doclist[:]  # create working copy of doclist
     removed_stops = doclist[:]
-    #the below statements remove all stopwords from every sentence in the list
-    #the sentences were split into separate terms and reconstructed without stopwords
-    #stopword removal is significantly affecting performance (better summaries!)
+    # the below statements remove all stopwords from every sentence in the list
+    # the sentences were split into separate terms and reconstructed without stopwords
+    # stopword removal is significantly affecting performance (better summaries!)
     for i in range(n):
         doclist_nostop[i] = [stem(term.lower()) for term in doclist[i].split() if term.lower() not in stoplist and term not in punclist]
         doclist_nostop[i] = (' ').join(doclist_nostop[i])
         removed_stops[i] = [term for term in doclist[i].split() if term.lower() in stoplist]
         removed_stops[i] = (' ').join(removed_stops[i])
-        #print i, "-->", doclist_nostop[i]
+        # print i, "-->", doclist_nostop[i]
     sim_arr = [[1 for i in range(n)] for j in range(n)]
     for i in range(n):
         for j in range(n):
-            sim_arr[i][j]=float("{0:.4f}".format(float(similarity(doclist_nostop[i], doclist_nostop[j])))) #scale to 4 decimals
+            sim_arr[i][j]=float("{0:.4f}".format(float(similarity(doclist_nostop[i], doclist_nostop[j])))) # scale to 4 decimals
     for i in range(n):
         minVal = min(sim_arr[i])
         maxVal = max(sim_arr[i])
-        #print i, minVal, maxVal
-        sim_arr[i] = [(q-minVal)/(maxVal-minVal) for q in sim_arr[i]] #normalize between 0 and 1 
+        # print i, minVal, maxVal
+        sim_arr[i] = [(q-minVal)/(maxVal-minVal) for q in sim_arr[i]] # normalize between 0 and 1 
     docmatrix = np.array(sim_arr)
     dg = nx.from_numpy_matrix(docmatrix)
     scores = nx.pagerank(dg)
@@ -90,10 +106,19 @@ def textrank(doc, title):
 
 
 def textrank_tfidf(doc, title):
+    """TextRank implementation that uses TF-IDF as similarity measure.
+    Tokenizes document into sentences, appends title as another sentence,
+    and constructs a set of sentences consisting of stemmed words with 
+    stopwords and punctuations stripped.
+    Constructs a vectorized representation of the resulting sentence list, 
+    Multiplies result with its transpose to obtain a NxN matrix, converting to a graph
+    and applying PageRank to obtain final scores. 
+    Returns sorted indices and tokenized sentence list.
+    """
     # print doc
-    #tokenizer = PunktSentenceTokenizer()
+    # tokenizer = PunktSentenceTokenizer()
     # print "Tokenizer, ", tokenizer
-    #docterms = word_tokenize(doc)
+    # docterms = word_tokenize(doc)
     sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
     stemmer = SnowballStemmer("english")
     doclist = sent_detector.tokenize(doc)
@@ -105,11 +130,13 @@ def textrank_tfidf(doc, title):
     for i in range(n):
         doclist_nostop[i] = [stem(term.lower()) for term in doclist[i].split() if term.lower() not in stoplist and term not in punclist]
         doclist_nostop[i] = (' ').join(doclist_nostop[i])
-    #print docterms_nostop
+    # print docterms_nostop
     # print "Doc list: ", doclist
-    vectorizer = TfidfVectorizer(tokenizer = word_tokenize, stop_words=stoplist, ngram_range=(1,2), norm='l2')
-    # print "Vectorizer:", vectorizer
+    punc_stoplist = punclist+stoplist
+    vectorizer = TfidfVectorizer(tokenizer = word_tokenize, stop_words=stoplist, ngram_range=(1,3), norm='l2')
+    #print "Vectorizer:", vectorizer
     docvectors = vectorizer.fit_transform(doclist_nostop)
+    # print vectorizer.get_feature_names()
     # print "Docvectors", docvectors
     # print "Docvectors array", docvectors.toarray()
     docmatrix = docvectors*docvectors.T
@@ -122,23 +149,33 @@ def textrank_tfidf(doc, title):
     return (sortedsents, doclist)
 
 
-def gen_summary(doc, title):
-    textrankres = textrank_tfidf(doc, title)
-    summindices = textrankres[0]
-    summsents = textrankres[1]
+def gen_summary(doc, title, summ_func):
+    """Accepts article body, title and summarization function to be used as parameter.
+    Constructs summary from list of sorted/ranked sentence indices and corresponding sentences.
+    """
+    summ_funcres = summ_func(doc, title)
+    summindices = summ_funcres[0]
+    summsents = summ_funcres[1]
     summary = ""
-    #d = int(raw_input("enter summary len in sentences\n"))
+    # d = int(raw_input("enter summary len in sentences\n"))
     d = 4
     if d > len(summsents):
         print "Invalid"
     else:
         for i in range(d):
             index = summindices[i]
-            summary += " "+summsents[index]
+            if len(summary)==0:
+                summary += summsents[index]
+            else:
+                summary += " "+summsents[index]
         return summary
 
 
 def tokencount(text):
+    """Tokenizes entire document (article) into words,
+    including stopwords but omitting common punctuations.
+    Returns number of such tokens in the document.
+    """
     text_tokens = word_tokenize(text)
     punclist = [',','.',':',';','\'','"','?','``','\'\'','\'s']
     text_tokens_nopunc = [term for term in text_tokens if term not in punclist]
@@ -146,14 +183,15 @@ def tokencount(text):
 
 
 def main():
-    text = """(CNN)After eluding capture for years, two Mafia bosses have been arrested in an underground bunker in southern Italy.   Police seized mobsters Giuseppe Ferraro, 47, and Giuseppe Crea, 37,  in Calabria region Friday, according to Italian news agency Ansa. Ferraro was found guilty of murder and Mafia association decades ago, and had been a fugitive since 1998. Crea was convicted of Mafia association and had been on the run for nine years, according to the news agency. Their hideout had an array of weapons, including rifles, pistols and machine guns. "Today is another great day for everyone and for the country because justice has won," Interior Minister Angelino Alfano said after their arrest.  Beyond Italian borders The two men are part of 'Ndrangheta, a dangerous criminal organization that has tentacles worldwide. The group is based in Calabria, where the two men were arrested.   'Ndrangheta's power has grown beyond Italian borders.  Two years ago, Italian officials said the group is linked to drug trafficking  in South and Central America, Canada and the United States.  The 'Ndrangheta was formed in the 1860s, and is involved in kidnappings, corruption, drug trafficking, gambling and murders, according to the FBI.  It has between 100-200 members in the United States, mostly in New York and Florida.  Opinion: Will Mafia ever loosen its grip on Italy? """
+    text = """After eluding capture for years, two Mafia bosses have been arrested in an underground bunker in southern Italy.   Police seized mobsters Giuseppe Ferraro, 47, and Giuseppe Crea, 37,  in Calabria region Friday, according to Italian news agency Ansa. Ferraro was found guilty of murder and Mafia association decades ago, and had been a fugitive since 1998. Crea was convicted of Mafia association and had been on the run for nine years, according to the news agency. Their hideout had an array of weapons, including rifles, pistols and machine guns. "Today is another great day for everyone and for the country because justice has won," Interior Minister Angelino Alfano said after their arrest.  Beyond Italian borders The two men are part of 'Ndrangheta, a dangerous criminal organization that has tentacles worldwide. The group is based in Calabria, where the two men were arrested.   'Ndrangheta's power has grown beyond Italian borders.  Two years ago, Italian officials said the group is linked to drug trafficking  in South and Central America, Canada and the United States.  The 'Ndrangheta was formed in the 1860s, and is involved in kidnappings, corruption, drug trafficking, gambling and murders, according to the FBI.  It has between 100-200 members in the United States, mostly in New York and Florida.  Opinion: Will Mafia ever loosen its grip on Italy? """
     title = """Italian police arrest 2 fugitive Mafia bosses in underground bunker"""
-    #text = raw_input("Enter body text\n")
-    #title = raw_input("Enter title\n")
+    # text = raw_input("Enter body text\n")
+    # title = raw_input("Enter title\n")
     print "Article text"
     print text
     print "Summary\n"
-    print gen_summary(text, title)
+    summary_function = textrank_tfidf
+    print gen_summary(text, title, summary_function)
 
 
 if __name__ == "__main__":

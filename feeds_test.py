@@ -1,15 +1,22 @@
-import feedparser
-import bs4
-import urllib2
+### Libraries
+# Standard library
 from datetime import datetime
 import json
-import pymongo as pm
 from hashlib import md5
+import urllib2
+
+# Third-party libraries
+import feedparser
+import bs4
+import pymongo as pm
 import textrank
 import parser
 
 
 def todb_article(source_feed, num_articles):
+    """Generator function that takes a source feed and number of articles as raw_input
+    and yields a JSON-like object consisting of article properties/metadata
+    """
     titles = {}
     article_text = {}
     date_now = datetime.now()
@@ -30,14 +37,14 @@ def todb_article(source_feed, num_articles):
         article_body = display_data[1]
         image_src = display_data[2]
 
-        if len(article_body) < 10:  # article is too short
+        if len(article_body) < 8:  # article is too short
             print "length of article insufficient"
             continue
 
         body_text_str = (" ").join(article_body)
-        #body_text_final = body_text_str.encode("utf-8")
+        # body_text_final = body_text_str.encode("utf-8")
         article_summary = textrank.gen_summary(body_text_str, article_title)
-        #if summary is too short, skip article
+        # if summary is too short, skip article
         if len(article_summary) < 200:
             print "summary too short"
             continue
@@ -48,9 +55,6 @@ def todb_article(source_feed, num_articles):
         len_body_words = textrank.tokencount(body_text_str)
         len_summary_words = textrank.tokencount(article_summary)
         compression_ratio = (len_body_words-len_summary_words)/(len_body_words*1.0)
-        # for i in range(15):
-        #   article_text[article_num][i]=parsed_article.p.text
-        #   print article_text[article_num][i]
 
         yield {
             'ID': article_id,
@@ -68,15 +72,20 @@ def todb_article(source_feed, num_articles):
 
 
 def main():
-    # News sources
-    #cnn_top = feedparser.parse('http://rss.cnn.com/rss/edition.rss')
-    cnn_world = feedparser.parse('http://rss.cnn.com/rss/edition_world.rss')
-    #cnn_tech = feedparser.parse('http://rss.cnn.com/rss/edition_technology.rss')
-    reuters_top = feedparser.parse('http://feeds.reuters.com/reuters/INtopNews')
-    #cnn_sport = feedparser.parse('http://rss.cnn.com/rss/edition_sport.rss')
-    et_top = feedparser.parse('http://economictimes.indiatimes.com/rssfeedstopstories.cms')
-    # Main code starts here
-    #src_feed = cnn_tech
+    ### News sources
+    # cnn_top = feedparser.parse('http://rss.cnn.com/rss/edition.rss')
+    source_urls = ['http://rss.cnn.com/rss/edition_world.rss',
+    'http://feeds.reuters.com/reuters/INtopNews',
+    'http://economictimes.indiatimes.com/rssfeedstopstories.cms'
+    ]
+    ## IMPORTANT!
+    # after adding more sources to above list, update source vars below
+    # with corresponding indices
+    cnn_world = feedparser.parse(source_urls[0])
+    # cnn_tech = feedparser.parse('http://rss.cnn.com/rss/edition_technology.rss')
+    reuters_top = feedparser.parse(source_urls[1])
+    # cnn_sport = feedparser.parse('http://rss.cnn.com/rss/edition_sport.rss')
+    et_top = feedparser.parse(source_urls[2])
     start = datetime.now()
 
     client = pm.MongoClient('localhost', 3001)
@@ -87,11 +96,17 @@ def main():
     # print "Source Feed ", src_feed
     sources = [cnn_world, reuters_top]
     insertcount = 0
+    source_index=0
     for src_feed in sources:
         len_src_feed = len(src_feed['entries'])
+        print "source feed", source_urls[source_index]
+        source_index += 1
+        choice = raw_input("continue with this source? (y/n)\n")
+        if choice in ['N','n','no','No']:
+            continue
         print "No. of articles in source feed", len_src_feed
-        #print "Enter no. of articles to parse, must be less than", len_src_feed
-        #n = int(raw_input())
+        # print "Enter no. of articles to parse, must be less than", len_src_feed
+        # n = int(raw_input())
         n=len_src_feed
         for article in todb_article(src_feed, n):
             article_id = articles.insert_one(article).inserted_id
