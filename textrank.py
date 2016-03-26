@@ -2,12 +2,11 @@
 # Standard library
 from collections import Counter
 from math import log10, log
+import re
 
 # Third-party libraries
-from nltk.tokenize.punkt import PunktSentenceTokenizer, PunktParameters
 import nltk.data
 from nltk.tokenize import word_tokenize
-from nltk.stem.snowball import SnowballStemmer
 from stemming.porter2 import stem
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 from nltk.corpus import stopwords
@@ -15,6 +14,40 @@ from networkx import drawing
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
+
+
+caps = "([A-Z])"
+prefixes = "(Mr|St|Mrs|Ms|Dr)[.]"
+suffixes = "(Inc|Ltd|Jr|Sr|Co)"
+starters = "(Mr|Mrs|Ms|Dr|He\s|She\s|It\s|They\s|Their\s|Our\s|We\s|But\s|However\s|That\s|This\s|Wherever)"
+acronyms = "([A-Z][.][A-Z][.](?:[A-Z][.])?)"
+websites = "[.](com|net|org|io|gov)"
+
+def split_into_sentences(text):
+    text = " " + text + "  "
+    text = text.replace("\n"," ")
+    text = re.sub(prefixes,"\\1<prd>",text)
+    text = re.sub(websites,"<prd>\\1",text)
+    if "Ph.D" in text: text = text.replace("Ph.D.","Ph<prd>D<prd>")
+    text = re.sub("\s" + caps + "[.] "," \\1<prd> ",text)
+    text = re.sub(acronyms+" "+starters,"\\1<stop> \\2",text)
+    text = re.sub(caps + "[.]" + caps + "[.]" + caps + "[.]","\\1<prd>\\2<prd>\\3<prd>",text)
+    text = re.sub(caps + "[.]" + caps + "[.]","\\1<prd>\\2<prd>",text)
+    text = re.sub(" "+suffixes+"[.] "+starters," \\1<stop> \\2",text)
+    text = re.sub(" "+suffixes+"[.]"," \\1<prd>",text)
+    text = re.sub(" " + caps + "[.]"," \\1<prd>",text)
+    if "\"" in text: text = text.replace(".\"","\".")
+    if "!" in text: text = text.replace("!\"","\"!")
+    if "?" in text: text = text.replace("?\"","\"?")
+    text = text.replace(".",".<stop>")
+    text = text.replace("?","?<stop>")
+    text = text.replace("!","!<stop>")
+    text = text.replace("<prd>",".")
+    sentences = text.split("<stop>")
+    sentences = sentences[:-1]
+    sentences = [s.strip() for s in sentences]
+    return sentences
+
 
 def similarity(s1, s2):
     """Calculates similarity between two sentences, by tokenizing them into words
@@ -65,11 +98,9 @@ def textrank(doc, title):
     # psparams.abbrev_types = set(['dr','mr','mrs', 'ms','U.S.','U.K.'])
     sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
     # pstoken = PunktSentenceTokenizer(psparams)
-    doclist = sent_detector.tokenize(doc) # split into sentences
+    doclist = split_into_sentences(doc) # split into sentences
     doclist.append(title) # append title to list for additional info
-    n = len(doclist)
-    stemmer = SnowballStemmer("english")
-    # for i in range(n):
+    n = len(doclist)    # for i in range(n):
     #     print i, "-->", doclist[i]
     # print "\n\n"
     stoplist = stopwords.words('english')
@@ -120,8 +151,7 @@ def textrank_tfidf(doc, title):
     # print "Tokenizer, ", tokenizer
     # docterms = word_tokenize(doc)
     sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
-    stemmer = SnowballStemmer("english")
-    doclist = sent_detector.tokenize(doc)
+    doclist = split_into_sentences(doc)
     doclist.append(title)
     n = len(doclist)
     stoplist = stopwords.words('english')

@@ -6,16 +6,7 @@ import string
 import bs4
 from nltk.tokenize.punkt import PunktSentenceTokenizer, PunktParameters
 import nltk.data
-
-
-def splitsentences(text):
-    # tknz_params = PunktParameters()
-    # tknz_params.abbrev_types = set(['dr','mr','mrs', 'ms','U.S.','U.K.'])
-    # tknz = PunktSentenceTokenizer(tknz_params)
-    sent_detector = nltk.data.load('tokenizers/punkt/english.pickle')
-    sents = sent_detector.tokenize(text)
-    return sents
-
+from textrank import split_into_sentences
 
 def get_article_data(link, bs_article_object):
     """Parses each article, given a BeautifulSoup article object (html).
@@ -28,7 +19,8 @@ def get_article_data(link, bs_article_object):
         container = bs_article_object.find('div', {'class': 'l-container'})
         body_text = ["".join(x.findAll(text=True)) for x in container.findAllNext(
             "p", {'class': 'zn-body__paragraph'})]
-        body_text_buffer = []
+        body_text_temp = (' ').join(body_text)
+        body_text = split_into_sentences(body_text_temp)
         for sent_index in range(len(body_text)):
             if "(CNN)" in body_text[sent_index]:
                 body_text[sent_index] = string.replace(body_text[sent_index], "(CNN)", "")
@@ -54,7 +46,7 @@ def get_article_data(link, bs_article_object):
         container = bs_article_object.find('span', {'id': 'articleText'})
         # body_text = ["".join(x.findAll(text=True)) for x in container.findAllNext("p")]
         article_text = container.text
-        body_text = splitsentences(article_text)
+        body_text = split_into_sentences(article_text)
         try:
             image_cont = bs_article_object.find('div', {'class':'related-photo-container'})
             print type(image_cont)
@@ -76,7 +68,7 @@ def get_article_data(link, bs_article_object):
         source = "Economic Times"
         container = bs_article_object.find('div', {'class': 'Normal'})
         article_text = container.text
-        body_text = splitsentences(article_text)
+        body_text = split_into_sentences(article_text)
         try:
             image_cont = bs_article_object.find('figure')
             image_tag = image_cont.find('img')

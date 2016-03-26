@@ -43,7 +43,7 @@ def todb_article(source_feed, num_articles):
 
         body_text_str = (" ").join(article_body)
         # body_text_final = body_text_str.encode("utf-8")
-        article_summary = textrank.gen_summary(body_text_str, article_title)
+        article_summary = textrank.gen_summary(body_text_str, article_title, textrank.textrank_tfidf)
         # if summary is too short, skip article
         if len(article_summary) < 200:
             print "summary too short"
