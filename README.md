@@ -1,12 +1,14 @@
-#Repository for Final Year Project on Automatic Text Summarization
+#Repository for Final Year Project on Automatic Text Summarization  
 
-###Contributors:
+###Contributors  
 Ajinkya Zadbuke  
 Sahil Pimenta  
 Deepen Padwal  
 
-###Description:  
-<to-do>
+###Description  
+Summ-It is an application that fetches summarized news articles from sources such as CNN, Reuters etc.  
+It uses Python for fetching, parsing and implementing summarization techniques, and MeteorJS as the  
+web-application server.  
 
 ###Folder Structure  
 FYProject/  
@@ -18,11 +20,20 @@ FYProject/
 ------------------> fyproject-meteor.html  
 ------------------> fyproject-meteor.css  
 ------------------> fyproject-meteor.js  
-------------------> public/   ... (dir for public files, images etc)  
+------------------> public/   ... (directory for public files, images etc)  
 ------------------> libs/     ... (files in here loaded first)  
-------------------> journal/  
 
-###Procedure for running application
+###Python Package Requirements  
+NLTK (with Punkt tokenization module included)  
+Scikit-learn  
+Stemming  
+NetworkX  
+Matplotlib (optional)  
+PyMongo  
+FeedParser  
+BeautifulSoup4  
+
+###Procedure for running application  
 1. Run mongod instance in separate terminal  
    FYProject$ mongod --port 3001 --dbpath fyproject-meteor/.meteor/local/db
 
@@ -35,7 +46,8 @@ FYProject/
    FYProject/fyproject-meteor$ MONGO_URL="mongodb://localhost:3001/feeds_database" meteor run --port 3005
 
 ###Most Recent Changes  
----Textrank and Parser both use trained tokenization data (edge cases handled)
+---Stemming for better quality summaries.  
+---Textrank and Parser both use trained tokenization data (most edge cases handled).  
 ---Parser tokenization gives better article text.  
 ---Compression data processed while fetching, stored with article in db.  
 ---Added article fetch counts.  
@@ -48,6 +60,5 @@ FYProject/
 ###NOTES:  
 1. Default database name is "feeds_database", consisting of a single "articles" collection.  
    Create this database prior to any operations if running for the first time.   
-2. Default num. of articles fetched from each source is 15 (for now)  
-3. Summary generation call is made from feeds_test to textrank.py.  
-   Run textrank.py separately to test summarization without affecting articles in DB.
+2. Summary generation call is made from feeds_test to textrank.py.  
+   Run textrank.py separately to test summarization without affecting data in DB.  
