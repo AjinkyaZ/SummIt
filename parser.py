@@ -18,7 +18,7 @@ def get_article_data(link, bs_article_object):
         source = "CNN"
         container = bs_article_object.find('div', {'class': 'l-container'})
         body_text = ["".join(x.findAll(text=True)) for x in container.findAllNext(
-            "p", {'class': 'zn-body__paragraph'})]
+            "div", {'class': 'zn-body__paragraph'})]
         body_text_temp = (' ').join(body_text)
         body_text = split_into_sentences(body_text_temp)
         for sent_index in range(len(body_text)):
@@ -37,8 +37,10 @@ def get_article_data(link, bs_article_object):
             if "data:image/gif;base64" in image_source:
                 image_source = image_set['data-src-medium']
         except KeyError, e:
+            print "Exception encountered! \n", e
             image_source = 'default.png'
         except TypeError, e:
+            print "Exception encountered! \n", e
             image_source = 'default.png'
 
     elif "reuters.com" in link:
@@ -58,10 +60,13 @@ def get_article_data(link, bs_article_object):
                image_tag = image_cont.find('img')
                image_source = image_tag['src']
         except KeyError, e:
+            print "Exception encountered! \n", e
             image_source = 'default.png'
         except TypeError, e:
+            print "Exception encountered! \n", e
             image_source = 'default.png'
         except AttributeError, e:
+            print "Exception encountered! \n", e
             image_source = 'default.png'
 
     elif "economictimes.indiatimes" in link:
@@ -74,10 +79,31 @@ def get_article_data(link, bs_article_object):
             image_tag = image_cont.find('img')
             image_source = image_tag['src']
         except KeyError, e:
+            print "Exception encountered! \n", e
             image_source = 'default.png'
         except TypeError, e:
+            print "Exception encountered! \n", e
             image_source = 'default.png'
         except AttributeError, e:
+            print "Exception encountered! \n", e
+            image_source = 'default.png'
+
+    elif "fossbytes.com" in link:
+        source = "FossBytes"
+        container = bs_article_object.find('div', {'class':'su-column-inner'})
+        article_text = container.text
+        body_text = split_into_sentences(article_text)
+        try:
+            image_tag = bs_article_object.find('img', {'class':'size-full'})
+            image_source = image_tag['src']
+        except KeyError, e:
+            print "Exception encountered! \n", e
+            image_source = 'default.png'
+        except TypeError, e:
+            print "Exception encountered! \n", e
+            image_source = 'default.png'
+        except AttributeError, e:
+            print "Exception encountered! \n", e
             image_source = 'default.png'
     data = (source, body_text, image_source)
     return data

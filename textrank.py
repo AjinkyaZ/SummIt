@@ -21,7 +21,7 @@ prefixes = "(Mr|St|Mrs|Ms|Dr)[.]"
 suffixes = "(Inc|Ltd|Jr|Sr|Co)"
 starters = "(Mr|Mrs|Ms|Dr|He\s|She\s|It\s|They\s|Their\s|Our\s|We\s|But\s|However\s|That\s|This\s|Wherever)"
 acronyms = "([A-Z][.][A-Z][.](?:[A-Z][.])?)"
-websites = "[.](com|net|org|io|gov)"
+websites = "[.](com|net|org|io|gov|in)"
 
 def split_into_sentences(text):
     text = " " + text + "  "
@@ -68,6 +68,48 @@ def similarity(s1, s2):
     else:
         sim = len(common_terms)/(log10(len(terms_s1))+log10(len(terms_s2)))
     return sim
+
+
+def term_frequency(term, tokenized_document):
+    return tokenized_document.count(term)
+
+def sublinear_term_frequency(term, tokenized_document):
+    count = tokenized_document.count(term)
+    if count == 0:
+        return 0
+    return 1 + math.log(count)
+
+def augmented_term_frequency(term, tokenized_document):
+    max_count = max([term_frequency(t, tokenized_document) for t in tokenized_document])
+    return (0.5 + ((0.5 * term_frequency(term, tokenized_document))/max_count))
+
+def inverse_document_frequencies(tokenized_documents):
+    idf_values = {}
+    all_tokens_set = set([item for sublist in tokenized_documents for item in sublist])
+    for tkn in all_tokens_set:
+        contains_token = map(lambda doc: tkn in doc, tokenized_documents)
+        idf_values[tkn] = 1 + math.log(len(tokenized_documents)/(sum(contains_token)))
+    return idf_values
+
+def tfidf(documents):
+    tokenized_documents = [tokenize(d) for d in documents]
+    idf = inverse_document_frequencies(tokenized_documents)
+    tfidf_documents = []
+    for document in tokenized_documents:
+        doc_tfidf = []
+        for term in idf.keys():
+            tf = sublinear_term_frequency(term, document)
+            doc_tfidf.append(tf * idf[term])
+        tfidf_documents.append(doc_tfidf)
+    return tfidf_documents
+
+def cosine_similarity(vector1, vector2):
+    dot_product = sum(p*q for p,q in zip(vector1, vector2))
+    magnitude = math.sqrt(sum([val**2 for val in vector1])) * math.sqrt(sum([val**2 for val in vector2]))
+    if not magnitude:
+        return 0
+    return dot_product/magnitude
+
 
 def getsortedsents(inputscores):
     """Accepts a dictionary consisting of sentence scores ordered by index,
@@ -163,7 +205,7 @@ def textrank_tfidf(doc, title):
     # print docterms_nostop
     # print "Doc list: ", doclist
     punc_stoplist = punclist+stoplist
-    vectorizer = TfidfVectorizer(tokenizer = word_tokenize, stop_words=stoplist, ngram_range=(1,3), norm='l2')
+    vectorizer = TfidfVectorizer(tokenizer = word_tokenize)
     #print "Vectorizer:", vectorizer
     docvectors = vectorizer.fit_transform(doclist_nostop)
     # print vectorizer.get_feature_names()

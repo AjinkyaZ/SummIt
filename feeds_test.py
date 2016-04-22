@@ -20,15 +20,15 @@ def todb_article(source_feed, num_articles):
     titles = {}
     article_text = {}
     date_now = datetime.now()
-    date_now = date_now.strftime('%Y-%m-%d')
+    date_now = date_now.strftime('%B-%d-%G  %I:%M%p')
 
     for article_num in range(num_articles):
         print "fetching data -- link", (article_num+1)
         article_link = source_feed['entries'][article_num]['link']
         article_main = urllib2.urlopen(article_link).read()
         parsed_article = bs4.BeautifulSoup(article_main, 'html.parser')
-        titles[article_num] = parsed_article.h1.text
-        article_title = titles[article_num]
+        titles[article_num] = parsed_article.find('h1')
+        article_title = titles[article_num].text
         article_title = article_title.encode("utf-8")
         article_id = md5(article_title).hexdigest()
 
@@ -45,7 +45,7 @@ def todb_article(source_feed, num_articles):
         # body_text_final = body_text_str.encode("utf-8")
         article_summary = textrank.gen_summary(body_text_str, article_title, textrank.textrank_tfidf)
         # if summary is too short, skip article
-        if len(article_summary) < 200:
+        if len(article_summary) < 320:
             print "summary too short"
             continue
         if len(article_summary) > 1200:
@@ -71,21 +71,19 @@ def todb_article(source_feed, num_articles):
         }
 
 
-def main():
+def fetch_news():
     ### News sources
     # cnn_top = feedparser.parse('http://rss.cnn.com/rss/edition.rss')
     source_urls = ['http://rss.cnn.com/rss/edition_world.rss',
     'http://feeds.reuters.com/reuters/INtopNews',
-    'http://economictimes.indiatimes.com/rssfeedstopstories.cms'
+    'http://feeds.reuters.com/reuters/INsportsNews'
     ]
     ## IMPORTANT!
     # after adding more sources to above list, update source vars below
     # with corresponding indices
     cnn_world = feedparser.parse(source_urls[0])
-    # cnn_tech = feedparser.parse('http://rss.cnn.com/rss/edition_technology.rss')
     reuters_top = feedparser.parse(source_urls[1])
-    # cnn_sport = feedparser.parse('http://rss.cnn.com/rss/edition_sport.rss')
-    et_top = feedparser.parse(source_urls[2])
+    reuters_sports = feedparser.parse(source_urls[2])
     start = datetime.now()
 
     client = pm.MongoClient('localhost', 3001)
@@ -94,9 +92,10 @@ def main():
     db.articles.remove({})
     print db.collection_names()
     # print "Source Feed ", src_feed
-    sources = [cnn_world, reuters_top]
+    sources = [cnn_world, reuters_top, reuters_sports]
     insertcount = 0
     source_index=0
+    n=0 # default if no sources parsed
     for src_feed in sources:
         len_src_feed = len(src_feed['entries'])
         print "source feed", source_urls[source_index]
@@ -108,6 +107,8 @@ def main():
         # print "Enter no. of articles to parse, must be less than", len_src_feed
         # n = int(raw_input())
         n=len_src_feed
+        if n>20: 
+            n=20
         for article in todb_article(src_feed, n):
             article_id = articles.insert_one(article).inserted_id
             insertcount += 1
@@ -123,4 +124,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    fetch_news()

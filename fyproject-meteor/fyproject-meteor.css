@@ -15,17 +15,9 @@ p
 /* Smartphones (portrait and landscape) ----------- */
 @media only screen and (min-device-width : 320px) and (max-device-width : 480px) {
 /* Styles */
-h2
-{
-	font-size: 2em !important;
-	padding-left: 5px !important;
-	padding-right: 5px !important;
-	color: #fff;
-	text-shadow: 1px 1px 10px #111;
-}
 span
 {
-	opacity: 0;
+	opacity: 1;
 }
 p
 {
@@ -36,18 +28,10 @@ a:link, a:visited
 	color: #f00;
 	text-decoration: none;
 }
-.art_image
+.unit_contentdiv
 {
-	min-height: 500px;
-	max-height: 600px;
-	z-index: 0;
-}
-.unit_contentdiv:
-{
-	position: relative;
-	bottom: 20px;
-	z-index: 10;
-	padding: 10px 20px 10px 30px; /* top right bottom left */
+	min-height: 250px;
+	font-size: 120%;
 }
 }
 
