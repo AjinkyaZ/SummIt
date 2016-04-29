@@ -20,7 +20,8 @@ def todb_article(source_feed, num_articles):
     titles = {}
     article_text = {}
     date_now = datetime.now()
-    date_now = date_now.strftime('%B-%d-%G  %I:%M%p')
+    a_date = date_now.strftime('%B %d, %G')
+    a_time = date_now.strftime('%I:%M%p')
 
     for article_num in range(num_articles):
         print "fetching data -- link", (article_num+1)
@@ -67,7 +68,8 @@ def todb_article(source_feed, num_articles):
             'Link': article_link,
             'Source': article_src,
             'Image': image_src,
-            'Date': date_now
+            'Date': a_date,
+            'Time': a_time
         }
 
 
@@ -85,11 +87,12 @@ def fetch_news():
     reuters_top = feedparser.parse(source_urls[1])
     reuters_sports = feedparser.parse(source_urls[2])
     start = datetime.now()
-
     client = pm.MongoClient('localhost', 3001)
     db = client.feeds_database
     articles = db.articles
-    db.articles.remove({})
+    unique_articles = []
+    for article in articles.find():
+        unique_articles.append(article['ID'])
     print db.collection_names()
     # print "Source Feed ", src_feed
     sources = [cnn_world, reuters_top, reuters_sports]
@@ -110,14 +113,16 @@ def fetch_news():
         if n>20: 
             n=20
         for article in todb_article(src_feed, n):
-            article_id = articles.insert_one(article).inserted_id
-            insertcount += 1
-            print "inserting into db"
-            print article['ID']
-            print article['Title']
-            print article['Image']
-            # print article_id
-            # print articles.find_one(article_id)
+            if article['ID'] not in unique_articles:
+                articles.insert_one(article)
+                insertcount += 1
+                print "inserting into db"
+                print article['ID']
+                print article['Title']
+                print article['Image']
+            else:
+                print "Duplicate article -- skip"
+                continue
     print "Articles parsed : ", n*len(sources)
     print "Articles fetched : ", insertcount
     print "Time taken :", datetime.now()-start
