@@ -4,6 +4,7 @@ if (Meteor.isClient) {
   Deps.autorun(function(){
     handle=Meteor.subscribeWithPagination('articles', 5)
   });
+
   Template.viewArticles.helpers  ({ 
         //NOTE : 'event' is the name of variable from html template
         'article' : function () {
@@ -23,7 +24,11 @@ if (Meteor.isClient) {
 if (Meteor.isServer) {
   Meteor.startup(function () {
     Meteor.publish("articles", function(limit){
-      return articles.find({}, {limit:limit});
+      return articles.find({}, 
+        {
+          limit:limit,
+          sort: { timestamp : -1 }
+        });
     }); 
 
   });

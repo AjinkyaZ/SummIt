@@ -3,7 +3,8 @@
 from datetime import datetime
 import json
 from hashlib import md5
-import urllib2
+#import urllib2
+import requests
 
 # Third-party libraries
 import feedparser
@@ -20,13 +21,15 @@ def todb_article(source_feed, num_articles):
     titles = {}
     article_text = {}
     date_now = datetime.now()
-    a_date = date_now.strftime('%B %d, %G')
-    a_time = date_now.strftime('%I:%M%p')
+    timestamp = int(date_now.strftime('%s'))
+    d_date = date_now.strftime('%B %d, %G')
+    d_time = date_now.strftime('%I:%M%p')
 
     for article_num in range(num_articles):
         print "fetching data -- link", (article_num+1)
         article_link = source_feed['entries'][article_num]['link']
-        article_main = urllib2.urlopen(article_link).read()
+        #article_main = urllib2.urlopen(article_link).read()
+        article_main = requests.get(article_link).text
         parsed_article = bs4.BeautifulSoup(article_main, 'html.parser')
         titles[article_num] = parsed_article.find('h1')
         article_title = titles[article_num].text
@@ -68,8 +71,9 @@ def todb_article(source_feed, num_articles):
             'Link': article_link,
             'Source': article_src,
             'Image': image_src,
-            'Date': a_date,
-            'Time': a_time
+            'Timestamp': timestamp,
+            'Display_Date': d_date,
+            'Display_Time': d_time
         }
 
 

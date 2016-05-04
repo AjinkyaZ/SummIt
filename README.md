@@ -32,6 +32,7 @@ Matplotlib (optional)
 PyMongo  
 FeedParser  
 BeautifulSoup4  
+Requests (previously urllib2)   
 
 ###Procedure for running application  
 1. Run mongod instance in separate terminal  
@@ -46,6 +47,10 @@ BeautifulSoup4
    FYProject/fyproject-meteor$ MONGO_URL="mongodb://localhost:3001/feeds_database" meteor run --port 3005
 
 ###Most Recent Changes  
+---Sort articles based on timestamp. 
+---Replaced urllib2 with Requests.   
+---Separate Date and Time fields.  
+---Check for duplicate articles based on hash of Title.  
 ---Stemming for better quality summaries.  
 ---Textrank and Parser both use trained tokenization data (most edge cases handled).  
 ---Parser tokenization gives better article text.  
