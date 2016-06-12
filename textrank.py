@@ -69,19 +69,16 @@ def similarity(s1, s2):
         sim = len(common_terms)/(log10(len(terms_s1))+log10(len(terms_s2)))
     return sim
 
-
+# reference calculations for TF-IDF.. scikit's vectorizer works much better
 def term_frequency(term, tokenized_document):
     return tokenized_document.count(term)
 
-def sublinear_term_frequency(term, tokenized_document):
+def logscaled_term_frequency(term, tokenized_document):
     count = tokenized_document.count(term)
     if count == 0:
         return 0
-    return 1 + math.log(count)
-
-def augmented_term_frequency(term, tokenized_document):
-    max_count = max([term_frequency(t, tokenized_document) for t in tokenized_document])
-    return (0.5 + ((0.5 * term_frequency(term, tokenized_document))/max_count))
+    else:
+        return 1 + math.log(count)
 
 def inverse_document_frequencies(tokenized_documents):
     idf_values = {}
@@ -98,7 +95,7 @@ def tfidf(documents):
     for document in tokenized_documents:
         doc_tfidf = []
         for term in idf.keys():
-            tf = sublinear_term_frequency(term, document)
+            tf = logscaled_term_frequency(term, document)
             doc_tfidf.append(tf * idf[term])
         tfidf_documents.append(doc_tfidf)
     return tfidf_documents
@@ -205,7 +202,7 @@ def textrank_tfidf(doc, title):
     # print docterms_nostop
     # print "Doc list: ", doclist
     punc_stoplist = punclist+stoplist
-    vectorizer = TfidfVectorizer(tokenizer = word_tokenize)
+    vectorizer = TfidfVectorizer(tokenizer = word_tokenize, ngram_range = (1,3), norm = 'l2')
     #print "Vectorizer:", vectorizer
     docvectors = vectorizer.fit_transform(doclist_nostop)
     # print vectorizer.get_feature_names()
