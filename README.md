@@ -10,6 +10,9 @@ Summ-It is an application that fetches summarized news articles from sources suc
 It uses Python for fetching, parsing and implementing summarization techniques, and MeteorJS as the  
 web-application server.  
 
+###Screenshot  
+![alt tag](https://raw.githubusercontent.com/AjinkyaZ/FYProject/master/fypscr1.png)
+
 ###Folder Structure  
 FYProject/  
 -----> feeds_test.py   ... (fetches data from RSS feeds)  
@@ -47,7 +50,7 @@ Requests (previously urllib2)
    FYProject/fyproject-meteor$ MONGO_URL="mongodb://localhost:3001/feeds_database" meteor run --port 3005
 
 ###Most Recent Changes  
----Sort articles based on timestamp. 
+---Sort articles based on timestamp.  
 ---Replaced urllib2 with Requests.   
 ---Separate Date and Time fields.  
 ---Check for duplicate articles based on hash of Title.  
