@@ -11,7 +11,7 @@ It uses Python for fetching, parsing and implementing summarization techniques, 
 web-application server.  
 
 ###Screenshot  
-![alt tag](https://raw.githubusercontent.com/AjinkyaZ/FYProject/master/fypscr1.png)
+![alt tag](fypscr1.png)
 
 ###Folder Structure  
 FYProject/  
