@@ -15,8 +15,8 @@ web-application server.
 
 ###Folder Structure  
 FYProject/  
------> feeds_test.py   ... (fetches data from RSS feeds)  
------> db_test.py      ... (displays data stored in DB)  
+-----> fetch_feeds.py   ... (fetches data from RSS feeds)  
+-----> view_data.py      ... (displays data stored in DB)  
 -----> parser.py      ... (implements parsing article html for content)   
 -----> textrank.py    ... (summarization algorithm)  
 -----> fyproject-meteor/  
@@ -43,8 +43,8 @@ Requests (previously urllib2)
 
 2. In another terminal run Python scripts  
    FYProject$ python <filename goes here>  
-   a. feeds_test.py   (fetch data, summaries)  
-   b. db_test.py    (display fetched data)  <optional, just for verification>  
+   a. fetch_feeds.py   (fetch data, summaries)  
+   b. view_data.py    (display fetched data)  <optional, just for verification>  
 
 3. Run Meteor application, specifying dbpath used previously  
    FYProject/fyproject-meteor$ MONGO_URL="mongodb://localhost:3001/feeds_database" meteor run --port 3005
