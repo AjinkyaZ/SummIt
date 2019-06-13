@@ -1,19 +1,19 @@
-#Repository for Final Year Project on Automatic Text Summarization  
+# Repository for Final Year Project on Automatic Text Summarization  
 
-###Contributors  
+### Contributors  
 Ajinkya Zadbuke  
 Sahil Pimenta  
 Deepen Padwal  
 
-###Description  
+### Description  
 Summ-It is an application that fetches summarized news articles from sources such as CNN, Reuters etc.  
 It uses Python for fetching, parsing and implementing summarization techniques, and MeteorJS as the  
 web-application server.  
 
-###Screenshot  
+### Screenshot  
 ![alt tag](fypscr1.png)
 
-###Folder Structure  
+### Folder Structure  
 FYProject/  
 -----> fetch_feeds.py   ... (fetches data from RSS feeds)  
 -----> view_data.py      ... (displays data stored in DB)  
@@ -26,7 +26,7 @@ FYProject/
 ------------------> public/   ... (directory for public files, images etc)  
 ------------------> libs/     ... (files in here loaded first)  
 
-###Python Package Requirements  
+### Python Package Requirements  
 NLTK (with Punkt tokenization module included)  
 Scikit-learn  
 Stemming  
@@ -37,7 +37,7 @@ FeedParser
 BeautifulSoup4  
 Requests (previously urllib2)   
 
-###Procedure for running application  
+### Procedure for running application  
 1. Run mongod instance in separate terminal  
    FYProject$ mongod --port 3001 --dbpath fyproject-meteor/.meteor/local/db
 
@@ -49,7 +49,7 @@ Requests (previously urllib2)
 3. Run Meteor application, specifying dbpath used previously  
    FYProject/fyproject-meteor$ MONGO_URL="mongodb://localhost:3001/feeds_database" meteor run --port 3005
 
-###Most Recent Changes  
+### Most Recent Changes  
 ---Sort articles based on timestamp.  
 ---Replaced urllib2 with Requests.   
 ---Separate Date and Time fields.  
@@ -65,7 +65,7 @@ Requests (previously urllib2)
 ---Fixed Image Fetching for both CNN, Reuters.  
 ---gen_summary() call in db_test replaced by summary property of article loaded from db (faster)  
 
-###NOTES:  
+### NOTES:  
 1. Default database name is "feeds_database", consisting of a single "articles" collection.  
    Create this database prior to any operations if running for the first time.   
 2. Summary generation call is made from feeds_test to textrank.py.  
